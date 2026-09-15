@@ -145,6 +145,15 @@
 .section-title .section-icon .icon-shape { -fx-fill: #00e9b3; }
 .page-title { -fx-text-fill: #00ffb3; -fx-font-size: 20px; -fx-font-weight: bold; }
 .page-subtitle { -fx-text-fill: #6f9fd8; -fx-font-size: 11px; }
+.icon-page-header {
+    -fx-padding: 13 16;
+    -fx-background-color: rgba(4,17,26,.88);
+    -fx-border-color: #008d85;
+    -fx-border-width: 1px;
+    -fx-border-radius: 7px;
+    -fx-background-radius: 7px;
+}
+.page-header-icon .icon-shape { -fx-fill: #32e2c5; }
 .runtime-strip { -fx-padding: 12 18; }
 .status-column > .label:first-child { -fx-text-fill: #70a7e5; -fx-font-size: 10px; }
 .status-column > .label { -fx-text-fill: #00ffb3; -fx-font-size: 16px; -fx-font-weight: bold; }
@@ -155,8 +164,16 @@
 
 /* ---------- Target Server screen ---------- */
 .target-panel { -fx-background-color: transparent; }
-.form-label { -fx-text-fill: #b9d8ff; -fx-font-size: 12px; }
-.form-hint { -fx-text-fill: #6196cf; -fx-font-size: 9px; }
+.target-form { -fx-padding: 2 0 3 0; }
+.target-field-group { -fx-padding: 0 2; }
+.target-field-group .text-field,
+.target-field-group .combo-box {
+    -fx-min-height: 43px;
+    -fx-pref-height: 43px;
+    -fx-font-size: 14px;
+}
+.form-label { -fx-text-fill: #b9d8ff; -fx-font-size: 13px; }
+.form-hint { -fx-text-fill: #6196cf; -fx-font-size: 10px; }
 .form-icon .icon-shape { -fx-fill: #2bd7d0; }
 .connection-title { -fx-text-fill: #00e9b3; -fx-font-size: 14px; -fx-font-weight: bold; }
 .connection-icon .icon-shape { -fx-fill: #30d8d7; }
@@ -166,15 +183,23 @@
     -fx-border-color: #00a879;
     -fx-border-radius: 6px; -fx-background-radius: 6px;
 }
-.connection-status-box .label:first-child { -fx-text-fill: #7fafe5; -fx-font-size: 10px; }
-.connection-status-box .label:last-child { -fx-text-fill: #00ffb3; -fx-font-size: 17px; -fx-font-weight: bold; }
+.connection-status-caption { -fx-text-fill: #7fafe5; -fx-font-size: 10px; }
+.connection-status-value { -fx-text-fill: #00ffb3; -fx-font-size: 17px; -fx-font-weight: bold; }
+.connection-status-divider { -fx-padding: 0 4; }
+.connection-status-divider .line { -fx-border-color: #16465e; -fx-border-width: 0 0 0 1px; }
+.connection-metric-key { -fx-text-fill: #6f9fd8; -fx-font-size: 9px; }
+.connection-metric-value { -fx-text-fill: #b7d7ff; -fx-font-size: 10px; -fx-font-weight: bold; }
 .status-shield .icon-shape { -fx-fill: #00ffb3; }
 .info-key { -fx-text-fill: #8bb5e7; }
+.info-row-icon .icon-shape { -fx-fill: #45d8d3; }
 .server-visual {
-    -fx-min-width: 150px; -fx-min-height: 130px;
-    -fx-background-color: radial-gradient(center 50% 50%, radius 65%, rgba(0,255,179,.12), rgba(0,255,179,0));
+    -fx-min-width: 220px; -fx-min-height: 125px;
+    -fx-pref-height: 125px; -fx-max-height: 125px;
+    -fx-alignment: top-center;
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
 }
-.server-large-icon .icon-shape { -fx-fill: #00dca8; }
+.animated-network-globe { -fx-effect: dropshadow(gaussian, rgba(0,255,120,.34), 14, .20, 0, 0); }
 .preset-button {
     -fx-min-height: 43px; -fx-padding: 7 12;
     -fx-background-color: rgba(0,255,179,.035);
@@ -186,6 +211,7 @@
 .preset-name { -fx-text-fill: #00eeb1; -fx-font-weight: bold; }
 .preset-address { -fx-text-fill: #8fbcea; -fx-font-size: 10px; }
 .preset-icon .icon-shape { -fx-fill: #00dfaf; }
+.preset-chevron .icon-shape { -fx-fill: #25cfc5; }
 
 /* ---------- Metric cards ---------- */
 .metric-card {

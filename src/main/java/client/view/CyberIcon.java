@@ -5,7 +5,11 @@ import javafx.scene.shape.SVGPath;
 
 /** Lightweight vector icons so the UI does not depend on an external icon font. */
 public final class CyberIcon {
-    public enum Type { SHIELD, HOME, DASHBOARD, SERVER, LIGHTNING, NETWORK, CHART, LOG, SETTINGS, TARGET, PLAY, STOP, RESET, EXPORT, TRASH }
+    public enum Type {
+        SHIELD, HOME, DASHBOARD, SERVER, MONITOR, PORT, LINK, WIFI, CHECK_CIRCLE,
+        LOCK, CHIP, CHEVRON_RIGHT, LIGHTNING, NETWORK, CHART, LOG, SETTINGS,
+        TARGET, PLAY, STOP, RESET, EXPORT, TRASH
+    }
 
     private CyberIcon() { }
 
@@ -30,6 +34,14 @@ public final class CyberIcon {
             case HOME -> "M12 2 2 10.2V22h7v-7h6v7h7V10.2L12 2zm0 3.1 7 5.7V19h-2v-6H7v6H5v-8.2l7-5.7z";
             case DASHBOARD -> "M3 3h8v8H3V3zm10 0h8v5h-8V3zM3 13h8v8H3v-8zm10-3h8v11h-8V10z";
             case SERVER -> "M3 3h18v5H3V3zm2 2v1h2V5H5zm-2 5h18v5H3v-5zm2 2v1h2v-1H5zm-2 5h18v4H3v-4zm2 1v1h2v-1H5z";
+            case MONITOR -> "M3 4h18v13H3V4zm2 2v9h14V6H5zm6 11h2v2h4v2H7v-2h4v-2z";
+            case PORT -> "M8 2h2v4h4V2h2v4h2a4 4 0 0 1 4 4v10H2V10a4 4 0 0 1 4-4h2V2zM4 10v8h16v-8H4zm3 2a2 2 0 1 1 0 4 2 2 0 0 1 0-4zm5 1h6v2h-6v-2z";
+            case LINK -> "M9.6 14.4 8.2 13l5.5-5.5a4 4 0 0 1 5.7 5.7l-3.1 3.1-1.4-1.4 3.1-3.1a2 2 0 1 0-2.9-2.9l-5.5 5.5zM14.4 9.6l1.4 1.4-5.5 5.5a4 4 0 0 1-5.7-5.7l3.1-3.1 1.4 1.4L6 12.2a2 2 0 1 0 2.9 2.9l5.5-5.5z";
+            case WIFI -> "M1 9l2 2a13 13 0 0 1 18 0l2-2A16 16 0 0 0 1 9zm4 4 2 2a7 7 0 0 1 10 0l2-2a10 10 0 0 0-14 0zm4 4 3 3 3-3a4.2 4.2 0 0 0-6 0z";
+            case CHECK_CIRCLE -> "M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 2a8 8 0 1 1 0 16 8 8 0 0 1 0-16zm-1.8 12.6-4-4 1.4-1.4 2.6 2.6 6.2-6.2 1.4 1.4-7.6 7.6z";
+            case LOCK -> "M6 10V7a6 6 0 0 1 12 0v3h2v12H4V10h2zm2 0h8V7a4 4 0 0 0-8 0v3zm4 3a2 2 0 0 0-1 3.7V19h2v-2.3A2 2 0 0 0 12 13z";
+            case CHIP -> "M8 2h2v3h4V2h2v3h3v3h3v2h-3v4h3v2h-3v3h-3v3h-2v-3h-4v3H8v-3H5v-3H2v-2h3v-4H2V8h3V5h3V2zm-1 5v10h10V7H7zm3 3h4v4h-4v-4z";
+            case CHEVRON_RIGHT -> "M8.6 4.6 16 12l-7.4 7.4L10 20.8l8.8-8.8L10 3.2 8.6 4.6z";
             case LIGHTNING -> "M13.5 1 4 13h6l-1 10 10-14h-6l.5-8z";
             case NETWORK -> "M12 2a3 3 0 1 1 0 6 3 3 0 0 1 0-6zM4 16a3 3 0 1 1 0 6 3 3 0 0 1 0-6zm16 0a3 3 0 1 1 0 6 3 3 0 0 1 0-6zM11 9h2v4.2l5.1 2.6-1 1.8-5.1-2.7-5.1 2.7-1-1.8 5.1-2.6V9z";
             case CHART -> "M3 20h18v2H1V3h2v17zm3-2V9h3v9H6zm5 0V4h3v14h-3zm5 0v-6h3v6h-3z";

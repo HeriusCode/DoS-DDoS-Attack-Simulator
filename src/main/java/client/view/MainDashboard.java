@@ -89,8 +89,9 @@ public final class MainDashboard extends BorderPane {
         progressText.setId("progressText");
         getStyleClass().add("app-shell");
         setTop(buildHeader());
-        TargetServerTab targetTab = new TargetServerTab(target, connectionLabel, responseTimeLabel,
-                httpStatusLabel, lastCheckedLabel, connectionLog, new TargetServerTab.Actions() {
+        target.setConnectionMetrics(responseTimeLabel, httpStatusLabel, lastCheckedLabel);
+        TargetServerTab targetTab = new TargetServerTab(target, connectionLabel, connectionLog,
+                new TargetServerTab.Actions() {
             @Override public void testConnection() { MainDashboard.this.testConnection(); }
             @Override public void selectPreset(String host, String port, String address) {
                 MainDashboard.this.selectTargetPreset(host, port, address);
@@ -497,8 +498,8 @@ public final class MainDashboard extends BorderPane {
     private Button dangerButton(String text) { Button button = new Button(text); button.setGraphic(CyberIcon.of(CyberIcon.Type.STOP, 14, "button-icon")); button.getStyleClass().addAll("cyber-button", "cyber-button-danger"); return button; }
 
     private void styleExistingButtons() {
-        target.test.getStyleClass().addAll("cyber-button", "cyber-button-secondary");
-        target.test.setGraphic(CyberIcon.of(CyberIcon.Type.TARGET, 14, "button-icon"));
+        target.test.getStyleClass().addAll("cyber-button", "cyber-button-success");
+        target.test.setGraphic(CyberIcon.of(CyberIcon.Type.PLAY, 14, "button-icon"));
         dos.start.getStyleClass().addAll("cyber-button", "cyber-button-success");
         dos.start.setGraphic(CyberIcon.of(CyberIcon.Type.PLAY, 14, "button-icon"));
         ddos.start.getStyleClass().addAll("cyber-button", "cyber-button-success");

@@ -4,7 +4,9 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.geometry.Pos;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 /** Shared, stateless widgets used by the independently managed tab views. */
@@ -19,8 +21,20 @@ final class ViewSupport {
         return panel;
     }
 
+    static VBox panel(String title, CyberIcon.Type icon, Node... content) {
+        VBox panel = new VBox(10, sectionTitle(title, icon));
+        panel.getChildren().addAll(content);
+        panel.getStyleClass().add("cyber-panel");
+        panel.setPadding(new javafx.geometry.Insets(11));
+        return panel;
+    }
+
     static Label sectionTitle(String text) {
-        Label label = new Label(text, CyberIcon.of(iconFor(text), 16, "section-icon"));
+        return sectionTitle(text, iconFor(text));
+    }
+
+    static Label sectionTitle(String text, CyberIcon.Type icon) {
+        Label label = new Label(text, CyberIcon.of(icon, 16, "section-icon"));
         label.getStyleClass().add("section-title");
         return label;
     }
@@ -37,6 +51,13 @@ final class ViewSupport {
         Label detail = new Label(subtitle);
         detail.getStyleClass().add("page-subtitle");
         return new VBox(3, heading, detail);
+    }
+
+    static HBox pageHeader(CyberIcon.Type icon, String title, String subtitle) {
+        HBox header = new HBox(14, CyberIcon.of(icon, 42, "page-header-icon"), pageHeader(title, subtitle));
+        header.setAlignment(Pos.CENTER_LEFT);
+        header.getStyleClass().add("icon-page-header");
+        return header;
     }
 
     static ScrollPane page(Node content) {
@@ -80,6 +101,14 @@ final class ViewSupport {
         key.getStyleClass().add("info-key");
         grid.add(key, 0, row);
         grid.add(value, 1, row);
+    }
+
+    static void addInfoRow(GridPane grid, int row, CyberIcon.Type icon, String name, Label value) {
+        Label key = new Label(name);
+        key.getStyleClass().add("info-key");
+        grid.add(CyberIcon.of(icon, 15, "info-row-icon"), 0, row);
+        grid.add(key, 1, row);
+        grid.add(value, 2, row);
     }
 
     private static CyberIcon.Type iconFor(String title) {
