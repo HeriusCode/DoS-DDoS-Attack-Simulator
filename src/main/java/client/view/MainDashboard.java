@@ -494,9 +494,7 @@ public final class MainDashboard extends BorderPane {
             start.setDisable(running || verifiedTarget.isBlank()); stop.setDisable(!running);
         }));
         enabled.setCycleCount(Animation.INDEFINITE); enabled.play();
-        Label hint = new Label("Verify the private lab target before starting any logical workers.");
-        hint.setWrapText(true); hint.getStyleClass().add("hint-box");
-        return ddosPanel("QUICK ACTIONS", start, stop, reset, hint);
+        return ddosPanel("QUICK ACTIONS", start, stop, reset);
     }
 
     private VBox ddosPanel(String title, Node... children) {
@@ -890,7 +888,8 @@ public final class MainDashboard extends BorderPane {
         x.setLabel("Time"); y.setLabel("Requests/sec");
         LineChart<Number, Number> chart = new LineChart<>(x, y);
         chart.setAnimated(false); chart.setCreateSymbols(false); chart.setLegendVisible(false);
-        chart.setMinHeight(180); chart.setPrefHeight(205);
+        chart.setMinHeight(140);
+        chart.setPrefHeight(170);
         rateSeries.setName("Request Rate");
         chart.getData().add(rateSeries);
         return chart;
