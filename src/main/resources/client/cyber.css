@@ -136,7 +136,13 @@
     -fx-border-radius: 7px; -fx-background-radius: 7px;
 }
 .cyber-panel { -fx-effect: dropshadow(gaussian, rgba(0,229,255,.08), 9, .1, 0, 0); }
-.section-title { -fx-text-fill: #00e9b3; -fx-font-size: 13px; -fx-font-weight: bold; }
+.section-title {
+    -fx-text-fill: #00e9b3;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-graphic-text-gap: 8px;
+}
+.section-title .section-icon .icon-shape { -fx-fill: #00e9b3; }
 .page-title { -fx-text-fill: #00ffb3; -fx-font-size: 20px; -fx-font-weight: bold; }
 .page-subtitle { -fx-text-fill: #6f9fd8; -fx-font-size: 11px; }
 .runtime-strip { -fx-padding: 12 18; }
@@ -247,6 +253,22 @@
     -fx-border-radius: 7px; -fx-background-radius: 7px;
 }
 .hacker-frame { -fx-padding: 3; -fx-alignment: center; -fx-effect: dropshadow(gaussian, rgba(0,255,179,.30), 16, .22, 0, 0); }
+.data-stream-card {
+    -fx-min-height: 230px;
+    -fx-alignment: center;
+    -fx-background-color: linear-gradient(to bottom, #010b04, #02180a);
+    -fx-border-color: #008d5a;
+    -fx-border-radius: 7px;
+    -fx-background-radius: 7px;
+    -fx-padding: 5px;
+}
+.data-stream-view {
+    -fx-min-height: 218px;
+    -fx-background-color: #000803;
+    -fx-border-color: #0d5d30;
+    -fx-border-radius: 4px;
+    -fx-background-radius: 4px;
+}
 .separator .line { -fx-border-color: #17465d; -fx-border-width: 1px 0 0 0; }
 
 /* ---------- DoS simulation screen ---------- */

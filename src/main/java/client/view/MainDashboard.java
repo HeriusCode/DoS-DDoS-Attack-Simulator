@@ -129,14 +129,14 @@ public final class MainDashboard extends BorderPane {
 
         VBox targetCard = buildDashboardTargetCard();
         VBox actions = buildQuickActions();
-        VBox hacker = buildHackerCard();
-        HBox bottom = new HBox(12, targetCard, actions, hacker);
+        VBox dataStream = buildDataStreamCard();
+        HBox bottom = new HBox(12, targetCard, actions, dataStream);
         HBox.setHgrow(targetCard, Priority.ALWAYS);
         HBox.setHgrow(actions, Priority.ALWAYS);
-        HBox.setHgrow(hacker, Priority.ALWAYS);
+        HBox.setHgrow(dataStream, Priority.ALWAYS);
         targetCard.setPrefWidth(390);
         actions.setPrefWidth(310);
-        hacker.setPrefWidth(360);
+        dataStream.setPrefWidth(360);
 
         content.getChildren().addAll(middle, bottom);
         ScrollPane scroll = new ScrollPane(content);
@@ -209,19 +209,13 @@ public final class MainDashboard extends BorderPane {
         return cyberPanel("QUICK ACTIONS", dashboardStart, dashboardStop, reset);
     }
 
-    private VBox buildHackerCard() {
-        ImageView image = new ImageView(new Image(
-                MainDashboard.class.getResourceAsStream("/client/assets/hacker-quick-actions.png")));
-        image.setPreserveRatio(true);
-        image.setSmooth(true);
-        image.setFitWidth(315);
-        image.setFitHeight(220);
-        StackPane frame = new StackPane(image);
-        frame.getStyleClass().add("hacker-frame");
-        frame.setMinHeight(215);
-        VBox box = new VBox(frame);
-        box.getStyleClass().add("hacker-card");
-        VBox.setVgrow(frame, Priority.ALWAYS);
+    private VBox buildDataStreamCard() {
+        DataStreamView stream = new DataStreamView();
+        stream.setMinHeight(218);
+        stream.setPrefHeight(218);
+        VBox box = new VBox(stream);
+        box.getStyleClass().add("data-stream-card");
+        VBox.setVgrow(stream, Priority.ALWAYS);
         return box;
     }
 
@@ -1019,7 +1013,21 @@ public final class MainDashboard extends BorderPane {
         return panel;
     }
 
-    private Label sectionLabel(String text) { Label label = new Label(text); label.getStyleClass().add("section-title"); return label; }
+    private Label sectionLabel(String text) {
+        Label label = new Label(text, CyberIcon.of(sectionIconFor(text), 16, "section-icon"));
+        label.getStyleClass().add("section-title");
+        return label;
+    }
+
+    private CyberIcon.Type sectionIconFor(String title) {
+        String value = title.toUpperCase();
+        if (value.contains("LOG")) return CyberIcon.Type.LOG;
+        if (value.contains("TARGET") || value.contains("SERVER")) return CyberIcon.Type.TARGET;
+        if (value.contains("STAT") || value.contains("RATE")) return CyberIcon.Type.CHART;
+        if (value.contains("QUICK")) return CyberIcon.Type.LIGHTNING;
+        if (value.contains("SIMULATION")) return CyberIcon.Type.NETWORK;
+        return CyberIcon.Type.DASHBOARD;
+    }
     private Label value(String text) { Label label = new Label(text); label.getStyleClass().add("value-text"); return label; }
     private Separator divider() { Separator separator = new Separator(javafx.geometry.Orientation.VERTICAL); separator.setPrefHeight(60); return separator; }
     private VBox pair(String title, Label value) { return new VBox(2, new Label(title), value); }
