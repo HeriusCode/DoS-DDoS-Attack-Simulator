@@ -7,12 +7,12 @@ import javafx.scene.layout.Priority;
 
 /** Six compact cards tailored to the single-source DoS screen. */
 public final class DosStatisticsPanel extends GridPane {
-    private final MetricCard sent = new MetricCard(CyberIcon.Type.EXPORT, "Requests Sent", "metric-blue");
-    private final MetricCard success = new MetricCard(CyberIcon.Type.SHIELD, "Successful", "metric-green");
-    private final MetricCard failed = new MetricCard(CyberIcon.Type.LIGHTNING, "Failed / Limited", "metric-red");
+    private final MetricCard sent = new MetricCard(CyberIcon.Type.SEND, "Requests Sent", "metric-blue");
+    private final MetricCard success = new MetricCard(CyberIcon.Type.CHECK_CIRCLE, "Successful", "metric-green");
+    private final MetricCard failed = new MetricCard(CyberIcon.Type.WARNING, "Failed / Limited", "metric-red");
     private final MetricCard rate = new MetricCard(CyberIcon.Type.CHART, "Current RPS", "metric-purple");
-    private final MetricCard response = new MetricCard(CyberIcon.Type.TARGET, "Avg Response Time", "metric-yellow");
-    private final MetricCard elapsed = new MetricCard(CyberIcon.Type.RESET, "Elapsed Time", "metric-cyan");
+    private final MetricCard response = new MetricCard(CyberIcon.Type.CLOCK, "Avg Response Time", "metric-yellow");
+    private final MetricCard elapsed = new MetricCard(CyberIcon.Type.CLOCK, "Elapsed Time", "metric-cyan");
 
     public DosStatisticsPanel() {
         setHgap(9);

@@ -8,7 +8,7 @@ public final class CyberIcon {
     public enum Type {
         SHIELD, HOME, DASHBOARD, SERVER, MONITOR, PORT, LINK, WIFI, CHECK_CIRCLE,
         LOCK, CHIP, CHEVRON_RIGHT, LIGHTNING, NETWORK, CHART, LOG, SETTINGS,
-        TARGET, PLAY, STOP, RESET, EXPORT, TRASH
+        TARGET, SEND, WARNING, CLOCK, CLIPBOARD, PLAY, STOP, RESET, EXPORT, TRASH
     }
 
     private CyberIcon() { }
@@ -48,6 +48,10 @@ public final class CyberIcon {
             case LOG -> "M5 2h10l4 4v16H5V2zm9 2v4h4M8 11h8v2H8v-2zm0 4h8v2H8v-2zm0 4h6v2H8v-2z";
             case SETTINGS -> "M10.7 2h2.6l.5 2.2c.6.2 1.1.4 1.6.7l2-1 1.8 1.8-1 2c.3.5.5 1 .7 1.6l2.1.5v2.6l-2.1.5c-.2.6-.4 1.1-.7 1.6l1 2-1.8 1.8-2-1c-.5.3-1 .5-1.6.7l-.5 2.1h-2.6l-.5-2.1c-.6-.2-1.1-.4-1.6-.7l-2 1-1.8-1.8 1-2c-.3-.5-.5-1-.7-1.6L3 13.3v-2.6l2.1-.5c.2-.6.4-1.1.7-1.6l-1-2 1.8-1.8 2 1c.5-.3 1-.5 1.6-.7L10.7 2zM12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8z";
             case TARGET -> "M11 2h2v3.1A7 7 0 0 1 18.9 11H22v2h-3.1a7 7 0 0 1-5.9 5.9V22h-2v-3.1A7 7 0 0 1 5.1 13H2v-2h3.1A7 7 0 0 1 11 5.1V2zm1 5a5 5 0 1 0 0 10 5 5 0 0 0 0-10zm0 3a2 2 0 1 1 0 4 2 2 0 0 1 0-4z";
+            case SEND -> "M2 3l20 9-20 9 4-8 9-1-9-1-4-8zm5.2 6.2L5.5 6.1 16.8 11 7.2 9.2zm0 5.6 9.6-1.8-11.3 4.9 1.7-3.1z";
+            case WARNING -> "M12 2 1 21h22L12 2zm0 4 7.5 13h-15L12 6zm-1 4v5h2v-5h-2zm0 7v2h2v-2h-2z";
+            case CLOCK -> "M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 2a8 8 0 1 1 0 16 8 8 0 0 1 0-16zm-1 3v6l5 3 1-1.7-4-2.3V7h-2z";
+            case CLIPBOARD -> "M9 2h6l1 2h3v18H5V4h3l1-2zm1.2 2-.5 1h4.6l-.5-1h-3.6zM8 9h8v2H8V9zm0 4h8v2H8v-2zm0 4h6v2H8v-2z";
             case PLAY -> "M6 3v18l15-9L6 3z";
             case STOP -> "M5 5h14v14H5z";
             case RESET -> "M12 4a8 8 0 1 1-7.4 5H2l3.5-4L9 9H6.7A6 6 0 1 0 12 6V4z";

@@ -5,6 +5,7 @@ import client.model.TrafficStatistics;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.css.PseudoClass;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -26,6 +27,8 @@ import java.util.function.Supplier;
 
 /** DoS simulation tab layout and live result rendering. */
 final class DosSimulationTab {
+    private static final PseudoClass CONNECTED = PseudoClass.getPseudoClass("connected");
+
     interface Actions { void testConnection(); void exportLog(); }
 
     private final TargetPanel target;
@@ -91,12 +94,20 @@ final class DosSimulationTab {
         ComboBox<String> protocol = new ComboBox<>();
         protocol.getItems().add("HTTP"); protocol.setValue("HTTP"); protocol.setMaxWidth(Double.MAX_VALUE);
         host.setMaxWidth(Double.MAX_VALUE); port.setMaxWidth(Double.MAX_VALUE);
-        Label state = new Label();
-        state.getStyleClass().add("dos-connection");
-        Timeline update = new Timeline(new KeyFrame(Duration.millis(500), event -> state.setText(connection.getText())));
-        update.setCycleCount(Animation.INDEFINITE); update.play();
-        Button test = ViewSupport.secondaryButton("TEST CONNECTION");
+        Button test = new Button("TEST CONNECTION", CyberIcon.of(CyberIcon.Type.LINK, 15, "button-icon"));
+        test.getStyleClass().addAll("cyber-button", "dos-test-connection");
+        test.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         test.setOnAction(event -> actions.testConnection());
+        Timeline update = new Timeline(new KeyFrame(Duration.millis(250), event -> {
+            String current = connection.getText().toLowerCase();
+            boolean connected = current.contains("connected") && !current.contains("failed");
+            test.setText(connected ? "CONNECTED" : "TEST CONNECTION");
+            test.setGraphic(CyberIcon.of(connected ? CyberIcon.Type.CHECK_CIRCLE : CyberIcon.Type.LINK,
+                    15, "button-icon"));
+            test.pseudoClassStateChanged(CONNECTED, connected);
+        }));
+        update.setCycleCount(Animation.INDEFINITE);
+        update.play();
 
         GridPane grid = new GridPane();
         grid.setHgap(12); grid.setVgap(8);
@@ -105,9 +116,7 @@ final class DosSimulationTab {
         }
         grid.add(new Label("Target IP"), 0, 0); grid.add(new Label("Port"), 1, 0); grid.add(new Label("Protocol"), 2, 0);
         grid.add(host, 0, 1); grid.add(port, 1, 1); grid.add(protocol, 2, 1);
-        VBox connectionBox = new VBox(3, state, new Label("Server reachability"));
-        connectionBox.getStyleClass().add("dos-connection-box");
-        grid.add(connectionBox, 3, 0, 1, 2); grid.add(test, 3, 2);
+        grid.add(test, 3, 0, 1, 2);
         return grid;
     }
 
@@ -129,7 +138,9 @@ final class DosSimulationTab {
         Label type = ViewSupport.value("DoS"), resultTarget = ViewSupport.value("-"), duration = ViewSupport.value("-");
         Label sent = ViewSupport.value("0"), success = ViewSupport.value("0"), failed = ViewSupport.value("0");
         Label limited = ViewSupport.value("0"), average = ViewSupport.value("0 ms"), rps = ViewSupport.value("0");
-        Label notice = new Label("No DoS simulation data yet"); notice.getStyleClass().add("dos-result-notice");
+        Label notice = new Label("No DoS simulation data yet",
+                CyberIcon.of(CyberIcon.Type.WARNING, 22, "dos-result-icon"));
+        notice.getStyleClass().add("dos-result-notice");
         GridPane result = new GridPane(); result.setHgap(20); result.setVgap(7);
         addCell(result, 0, 0, "Attack Type", type); addCell(result, 0, 1, "Target", resultTarget); addCell(result, 0, 2, "Duration", duration);
         addCell(result, 1, 0, "Requests Sent", sent); addCell(result, 1, 1, "Successful", success); addCell(result, 1, 2, "Failed", failed);
@@ -154,6 +165,18 @@ final class DosSimulationTab {
         panel.getStyleClass().addAll("cyber-panel", "dos-panel"); panel.setPadding(new Insets(11)); return panel;
     }
 
-    private Label sectionTitle(String text) { Label label = new Label(text); label.getStyleClass().add("dos-section-title"); return label; }
+    private Label sectionTitle(String text) {
+        CyberIcon.Type icon = switch (text) {
+            case "TARGET SERVER" -> CyberIcon.Type.SERVER;
+            case "SIMULATION CONTROLS" -> CyberIcon.Type.PLAY;
+            case "REAL-TIME STATISTICS" -> CyberIcon.Type.CHART;
+            case "LOG" -> CyberIcon.Type.LOG;
+            case "SIMULATION RESULT" -> CyberIcon.Type.CLIPBOARD;
+            default -> CyberIcon.Type.TARGET;
+        };
+        Label label = new Label(text, CyberIcon.of(icon, 18, "dos-section-icon"));
+        label.getStyleClass().add("dos-section-title");
+        return label;
+    }
     private void addCell(GridPane grid, int column, int row, String name, Label value) { grid.add(new VBox(2, new Label(name), value), column, row); }
 }

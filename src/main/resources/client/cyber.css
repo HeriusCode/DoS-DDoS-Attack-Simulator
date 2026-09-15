@@ -311,12 +311,31 @@
 .dos-view .page-title { -fx-text-fill: #ff3157; }
 .dos-title-icon .icon-shape { -fx-fill: #ff3157; }
 .dos-panel { -fx-border-color: #9e1830; -fx-background-color: rgba(10,12,20,.97); }
-.dos-section-title { -fx-text-fill: #ff3157; -fx-font-size: 14px; -fx-font-weight: bold; }
+.dos-section-title { -fx-text-fill: #ff3157; -fx-font-size: 14px; -fx-font-weight: bold; -fx-graphic-text-gap: 9px; }
+.dos-section-icon .icon-shape { -fx-fill: #ff3157; }
 .dos-controls .label { -fx-text-fill: #9ec5f2; }
+.dos-control-inputs { -fx-padding: 0 0 1 0; }
+.dos-control-status { -fx-min-width: 125px; -fx-padding: 1 4 0 1; }
+.dos-status-caption { -fx-text-fill: #8eb9e9; -fx-font-size: 11px; }
+.dos-control-divider { -fx-padding: 0 2; }
+.dos-control-divider .line { -fx-border-color: #8e172d; -fx-border-width: 0 0 0 1px; }
 .dos-state { -fx-text-fill: #ff3157; -fx-font-size: 16px; -fx-font-weight: bold; }
 .dos-status-dot { -fx-text-fill: #ff3157; -fx-effect: dropshadow(gaussian, rgba(255,23,68,.55), 9, .3, 0, 0); }
-.dos-connection { -fx-text-fill: #00ffb3; -fx-font-weight: bold; }
-.dos-connection-box { -fx-padding: 7 10; -fx-background-color: rgba(0,255,179,.07); -fx-border-color: #007c62; -fx-border-radius: 4px; -fx-background-radius: 4px; }
+.dos-test-connection {
+    -fx-min-height: 42px;
+    -fx-background-color: rgba(255,23,68,.035);
+    -fx-border-color: #a61935;
+    -fx-text-fill: #ff5a76;
+}
+.dos-test-connection:hover { -fx-background-color: rgba(255,23,68,.12); -fx-border-color: #ff3157; }
+.dos-test-connection .button-icon .icon-shape { -fx-fill: #ff3157; }
+.dos-test-connection:connected {
+    -fx-background-color: rgba(0,255,179,.13);
+    -fx-border-color: #00bd8b;
+    -fx-text-fill: #00ffb3;
+}
+.dos-test-connection:connected .button-icon .icon-shape { -fx-fill: #00ffb3; }
+.dos-result-icon .icon-shape { -fx-fill: #ff3157; }
 .dos-view .metric-card { -fx-border-color: #263f59; }
 .dos-view .metric-card:hover { -fx-border-color: #ff3157; }
 .dos-chart .default-color0.chart-series-line { -fx-stroke: #ff1744; -fx-stroke-width: 2px; }
