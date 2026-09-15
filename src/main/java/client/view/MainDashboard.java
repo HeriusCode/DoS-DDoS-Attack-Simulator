@@ -43,7 +43,7 @@ public final class MainDashboard extends BorderPane {
     private final DosStatisticsPanel dosStatistics = new DosStatisticsPanel();
     private final DdosStatisticsPanel ddosStatistics = new DdosStatisticsPanel();
     private final AttackController controller = new AttackController();
-    private final TabPane tabs = new TabPane();
+    private final TopNavigation tabs = new TopNavigation();
 
     private final TextArea dashboardLog = terminal();
     private final TextArea fullLog = terminal();
@@ -89,9 +89,10 @@ public final class MainDashboard extends BorderPane {
         progressText.setId("progressText");
         getStyleClass().add("app-shell");
         setTop(buildHeader());
-        configureTabs();
-        VBox mainArea = new VBox(12, buildTargetStatusRow(), tabs);
-        mainArea.setPadding(new Insets(14, 14, 12, 14));
+        tabs.configure(buildDashboard(), buildTargetView(), buildDosView(), buildDdosView(), buildLogsView(),
+                ddosMode -> selectedDdos = ddosMode);
+        VBox mainArea = new VBox(tabs);
+        mainArea.setPadding(new Insets(4, 10, 10, 10));
         VBox.setVgrow(tabs, Priority.ALWAYS);
         setCenter(mainArea);
 
@@ -113,24 +114,6 @@ public final class MainDashboard extends BorderPane {
         appendLog("INFO", "Ready. Verify a private lab target before starting.");
         appendConnectionLog("INFO", "Target module initialized");
         appendConnectionLog("INFO", "Ready for connection test");
-    }
-
-    private void configureTabs() {
-        tabs.getStyleClass().add("cyber-tabs");
-        tabs.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
-        tabs.getTabs().addAll(
-                tab("DASHBOARD", CyberIcon.Type.DASHBOARD, buildDashboard()),
-                tab("TARGET SERVER", CyberIcon.Type.SERVER, buildTargetView()),
-                tab("DoS SIMULATION", CyberIcon.Type.LIGHTNING, buildDosView()),
-                tab("DDoS SIMULATION", CyberIcon.Type.NETWORK, buildDdosView()),
-                tab("LOGS", CyberIcon.Type.LOG, buildLogsView())
-        );
-        tabs.getTabs().get(2).getStyleClass().add("dos-tab");
-        tabs.getTabs().get(3).getStyleClass().add("ddos-tab");
-        tabs.getSelectionModel().selectedIndexProperty().addListener((observable, oldIndex, newIndex) -> {
-            if (newIndex.intValue() == 2) selectedDdos = false;
-            if (newIndex.intValue() == 3) selectedDdos = true;
-        });
     }
 
     private Node buildDashboard() {
@@ -786,7 +769,14 @@ public final class MainDashboard extends BorderPane {
     }
 
     private HBox buildHeader() {
-        Node logo = CyberIcon.of(CyberIcon.Type.SHIELD, 38, "header-logo");
+        ImageView logoImage = new ImageView(new Image(
+                MainDashboard.class.getResourceAsStream("/client/assets/header-logo.png")));
+        logoImage.setPreserveRatio(true);
+        logoImage.setSmooth(true);
+        logoImage.setFitWidth(39);
+        logoImage.setFitHeight(39);
+        StackPane logo = new StackPane(logoImage);
+        logo.getStyleClass().add("header-logo");
         Label brand = new Label("DOS/DDoS ATTACK SIMULATOR");
         brand.getStyleClass().add("brand");
         Label environment = new Label("|   Lab Environment   |   Educational Use Only");
@@ -827,8 +817,8 @@ public final class MainDashboard extends BorderPane {
         ImageView hacker = new ImageView(new Image(
                 MainDashboard.class.getResourceAsStream("/client/assets/hacker-sidebar.png")));
         hacker.setPreserveRatio(true);
-        hacker.setFitWidth(174);
-        hacker.setFitHeight(180);
+        hacker.setFitWidth(188);
+        hacker.setFitHeight(194);
         hacker.getStyleClass().add("sidebar-hacker");
         Label footer = new Label("SECURE LAB CLIENT\nSTAY SAFE • LEARN & BUILD");
         footer.getStyleClass().add("sidebar-footer");
@@ -855,7 +845,7 @@ public final class MainDashboard extends BorderPane {
         button.getStyleClass().add("sidebar-item");
         if (active) button.getStyleClass().add("sidebar-item-active");
         button.setOnAction(event -> {
-            tabs.getSelectionModel().select(tabIndex);
+            tabs.selectTab(tabIndex);
             selectedDdos = tabIndex == 3 || (tabIndex != 2 && selectedDdos);
             Node parent = button.getParent();
             if (parent instanceof Pane pane) {
@@ -1069,11 +1059,6 @@ public final class MainDashboard extends BorderPane {
 
     private String targetKey(TargetServer server) { return server.host() + ":" + server.port(); }
     private String formatTime(long seconds) { return "%02d:%02d".formatted(seconds / 60, seconds % 60); }
-    private Tab tab(String name, CyberIcon.Type icon, Node content) {
-        Tab tab = new Tab(name, content);
-        tab.setGraphic(CyberIcon.of(icon, 17, "tab-icon"));
-        return tab;
-    }
 
     private LineChart<Number, Number> createChart() {
         NumberAxis x = new NumberAxis(0, 30, 5);

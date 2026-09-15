@@ -5,7 +5,7 @@ import javafx.scene.shape.SVGPath;
 
 /** Lightweight vector icons so the UI does not depend on an external icon font. */
 public final class CyberIcon {
-    public enum Type { SHIELD, DASHBOARD, SERVER, LIGHTNING, NETWORK, CHART, LOG, SETTINGS, TARGET, PLAY, STOP, RESET, EXPORT, TRASH }
+    public enum Type { SHIELD, HOME, DASHBOARD, SERVER, LIGHTNING, NETWORK, CHART, LOG, SETTINGS, TARGET, PLAY, STOP, RESET, EXPORT, TRASH }
 
     private CyberIcon() { }
 
@@ -27,6 +27,7 @@ public final class CyberIcon {
     private static String path(Type type) {
         return switch (type) {
             case SHIELD -> "M12 1 21 5v6c0 5.5-3.8 10.3-9 12-5.2-1.7-9-6.5-9-12V5l9-4zm0 3.1L6 6.7V11c0 3.9 2.4 7.4 6 8.8 3.6-1.4 6-4.9 6-8.8V6.7l-6-2.6z";
+            case HOME -> "M12 2 2 10.2V22h7v-7h6v7h7V10.2L12 2zm0 3.1 7 5.7V19h-2v-6H7v6H5v-8.2l7-5.7z";
             case DASHBOARD -> "M3 3h8v8H3V3zm10 0h8v5h-8V3zM3 13h8v8H3v-8zm10-3h8v11h-8V10z";
             case SERVER -> "M3 3h18v5H3V3zm2 2v1h2V5H5zm-2 5h18v5H3v-5zm2 2v1h2v-1H5zm-2 5h18v4H3v-4zm2 1v1h2v-1H5z";
             case LIGHTNING -> "M13.5 1 4 13h6l-1 10 10-14h-6l.5-8z";
