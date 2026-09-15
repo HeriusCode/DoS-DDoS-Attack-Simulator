@@ -342,15 +342,39 @@
 .dos-chart .default-color1.chart-series-line { -fx-stroke: #274866; -fx-stroke-width: 2px; }
 .dos-chart .default-color0.chart-legend-item-symbol { -fx-background-color: #ff1744; }
 .dos-chart .default-color1.chart-legend-item-symbol { -fx-background-color: #274866; }
+.dos-chart-block { -fx-padding: 2 0 0 0; }
+.dos-chart-title { -fx-text-fill: #ff6b84; -fx-font-size: 13px; -fx-font-weight: bold; }
+.dos-chart-unit { -fx-text-fill: #7098c5; -fx-font-size: 9px; }
+.dos-legend-label { -fx-text-fill: #9dc3ef; -fx-font-size: 9px; }
+.dos-legend-line { -fx-min-width: 19px; -fx-pref-width: 19px; -fx-max-width: 19px; -fx-min-height: 3px; -fx-pref-height: 3px; -fx-max-height: 3px; }
+.dos-legend-current { -fx-background-color: #ff1744; }
+.dos-legend-target { -fx-background-color: #274866; }
 .chart-legend-item { -fx-text-fill: #9dc3ef; }
-.dos-result-notice {
-    -fx-min-width: 260px; -fx-padding: 18;
+.dos-result-data {
+    -fx-padding: 12 14;
+    -fx-background-color: #050f18;
+    -fx-border-color: #233f58;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+}
+.dos-result-group { -fx-min-width: 185px; }
+.dos-result-key { -fx-text-fill: #8fb8e9; -fx-font-size: 10px; }
+.dos-result-divider { -fx-padding: 0 4; }
+.dos-result-divider .line { -fx-border-color: #652033; -fx-border-width: 0 0 0 1px; }
+.dos-result-notice-card {
+    -fx-min-width: 300px;
+    -fx-pref-width: 330px;
+    -fx-padding: 18;
     -fx-background-color: rgba(255,23,68,.06);
     -fx-border-color: #72172b;
     -fx-border-radius: 6px; -fx-background-radius: 6px;
+}
+.dos-result-notice-title {
     -fx-text-fill: #ff5974;
     -fx-font-weight: bold;
+    -fx-graphic-text-gap: 10px;
 }
+.dos-result-notice-detail { -fx-text-fill: #7fa8d6; -fx-font-size: 10px; }
 
 /* ---------- DDoS simulation screen ---------- */
 .tab.ddos-tab:selected { -fx-background-color: linear-gradient(to bottom, #4a0b19, #250812); -fx-border-color: #ff1744; }
@@ -365,11 +389,84 @@
 .ddos-view .page-title { -fx-text-fill: #ff3157; }
 .ddos-title-icon .icon-shape { -fx-fill: #ff3157; }
 .ddos-panel { -fx-border-color: #a41834; -fx-background-color: rgba(8,12,20,.97); }
-.ddos-section-title { -fx-text-fill: #ff3157; -fx-font-size: 13px; -fx-font-weight: bold; }
+.ddos-section-title {
+    -fx-text-fill: #ff3157;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-graphic-text-gap: 9px;
+    -fx-padding: 0 0 7px 0;
+    -fx-border-color: transparent transparent #71162a transparent;
+    -fx-border-width: 0 0 1px 0;
+}
+.ddos-section-icon .icon-shape { -fx-fill: #ff3157; }
 .ddos-controls .label { -fx-text-fill: #9ec5f2; }
+.ddos-control-inputs { -fx-padding: 0 0 1px 0; }
+.ddos-control-divider { -fx-padding: 0 1px; }
+.ddos-control-divider .line { -fx-border-color: #8e172d; -fx-border-width: 0 0 0 1px; }
+.ddos-control-status-card {
+    -fx-min-width: 138px;
+    -fx-pref-width: 138px;
+    -fx-min-height: 100px;
+    -fx-padding: 9px 10px;
+    -fx-background-color: rgba(25,4,11,.46);
+    -fx-border-color: #8f1830;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
+}
+.ddos-status-caption { -fx-text-fill: #8eb9e9; -fx-font-size: 10px; }
+.ddos-elapsed { -fx-text-fill: #7da9d9; -fx-font-size: 10px; -fx-padding: 0 0 0 23px; }
+.ddos-control-hacker { -fx-opacity: .30; }
+.ddos-controls .cyber-button-success {
+    -fx-background-color: linear-gradient(to bottom, #ff2248, #b60729);
+    -fx-border-color: #ff3157;
+    -fx-text-fill: white;
+}
+.ddos-controls .cyber-button-success:hover { -fx-background-color: linear-gradient(to bottom, #ff4261, #d20a32); }
+.ddos-controls .cyber-button-success .button-icon .icon-shape { -fx-fill: white; }
 .ddos-state { -fx-text-fill: #ff3157; -fx-font-size: 16px; -fx-font-weight: bold; }
 .ddos-status-dot { -fx-text-fill: #ff3157; -fx-effect: dropshadow(gaussian, rgba(255,23,68,.55), 9, .3, 0, 0); }
-.ddos-connection { -fx-text-fill: #00ffb3; -fx-font-weight: bold; }
+.ddos-test-connection {
+    -fx-min-height: 42px;
+    -fx-background-color: rgba(255,23,68,.035);
+    -fx-border-color: #a61935;
+    -fx-text-fill: #ff5a76;
+}
+.ddos-test-connection:hover { -fx-background-color: rgba(255,23,68,.12); -fx-border-color: #ff3157; }
+.ddos-test-connection .button-icon .icon-shape { -fx-fill: #ff3157; }
+.ddos-test-connection:connected {
+    -fx-background-color: rgba(0,255,179,.13);
+    -fx-border-color: #00bd8b;
+    -fx-text-fill: #00ffb3;
+}
+.ddos-test-connection:connected .button-icon .icon-shape { -fx-fill: #00ffb3; }
+.ddos-chart-block { -fx-padding: 2px 0 0 0; }
+.ddos-chart-title { -fx-text-fill: #ff5d79; -fx-font-size: 13px; -fx-font-weight: bold; }
+.ddos-chart-unit { -fx-text-fill: #7098c5; -fx-font-size: 9px; }
+.ddos-legend-label { -fx-text-fill: #9dc3ef; -fx-font-size: 9px; }
+.ddos-legend-line {
+    -fx-min-width: 19px;
+    -fx-pref-width: 19px;
+    -fx-max-width: 19px;
+    -fx-min-height: 3px;
+    -fx-pref-height: 3px;
+    -fx-max-height: 3px;
+}
+.ddos-legend-total { -fx-background-color: #ff1744; }
+.ddos-legend-success { -fx-background-color: #00e9b3; }
+.ddos-map-frame {
+    -fx-alignment: center;
+    -fx-background-color: linear-gradient(to bottom, #02070c, #07080d);
+    -fx-border-color: #4d1320;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+    -fx-padding: 2px;
+}
+.ddos-map-panel { -fx-alignment: center; }
+.ddos-map-image {
+    -fx-opacity: .92;
+    -fx-effect: dropshadow(gaussian, rgba(255,23,68,.50), 12, .24, 0, 0);
+}
+.ddos-code-backdrop { -fx-background-color: transparent; }
 .ddos-view .metric-card { -fx-border-color: #23445e; -fx-min-height: 68px; }
 .ddos-view .metric-card:hover { -fx-border-color: #ff3157; }
 .ddos-chart .default-color0.chart-series-line { -fx-stroke: #ff1744; -fx-stroke-width: 2px; }

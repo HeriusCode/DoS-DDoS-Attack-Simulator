@@ -13,8 +13,10 @@ import javafx.scene.chart.LineChart;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.Separator;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.geometry.Orientation;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -81,7 +83,7 @@ final class DosSimulationTab {
         controlsBox.setPrefWidth(500);
         controlsBox.setMaxHeight(Double.MAX_VALUE);
 
-        VBox realtime = panel("REAL-TIME STATISTICS", statistics, chart);
+        VBox realtime = panel("REAL-TIME STATISTICS", statistics, chartBlock());
         VBox runtimeLog = logPanel();
         HBox middle = new HBox(14, realtime, runtimeLog);
         HBox.setHgrow(realtime, Priority.ALWAYS);
@@ -141,18 +143,72 @@ final class DosSimulationTab {
         return panel;
     }
 
+    private VBox chartBlock() {
+        chart.setLegendVisible(false);
+        Label chartTitle = new Label("Request Rate");
+        chartTitle.getStyleClass().add("dos-chart-title");
+        Label unit = new Label("(requests/sec)");
+        unit.getStyleClass().add("dos-chart-unit");
+        HBox title = new HBox(9, chartTitle, unit);
+        title.setAlignment(Pos.CENTER_LEFT);
+
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+        HBox legend = new HBox(18,
+                legendItem("Current RPS", "dos-legend-current"),
+                legendItem("Target RPS", "dos-legend-target"));
+        legend.setAlignment(Pos.CENTER_RIGHT);
+        HBox header = new HBox(10, title, spacer, legend);
+        header.setAlignment(Pos.CENTER_LEFT);
+
+        VBox block = new VBox(6, header, chart);
+        block.getStyleClass().add("dos-chart-block");
+        VBox.setVgrow(chart, Priority.ALWAYS);
+        return block;
+    }
+
+    private HBox legendItem(String text, String colorClass) {
+        Region line = new Region();
+        line.getStyleClass().addAll("dos-legend-line", colorClass);
+        Label label = new Label(text);
+        label.getStyleClass().add("dos-legend-label");
+        HBox item = new HBox(7, line, label);
+        item.setAlignment(Pos.CENTER_LEFT);
+        return item;
+    }
+
     private VBox resultPanel() {
         Label type = ViewSupport.value("DoS"), resultTarget = ViewSupport.value("-"), duration = ViewSupport.value("-");
         Label sent = ViewSupport.value("0"), success = ViewSupport.value("0"), failed = ViewSupport.value("0");
         Label limited = ViewSupport.value("0"), average = ViewSupport.value("0 ms"), rps = ViewSupport.value("0");
-        Label notice = new Label("No DoS simulation data yet",
+        Label workers = ViewSupport.value("0");
+
+        VBox targetGroup = resultGroup(
+                resultRow("Attack Type", type), resultRow("Target", resultTarget), resultRow("Duration", duration));
+        VBox requestGroup = resultGroup(
+                resultRow("Requests Sent", sent), resultRow("Successful", success),
+                resultRow("Failed", failed), resultRow("Limited / Rejected", limited));
+        VBox performanceGroup = resultGroup(
+                resultRow("Average Response Time", average), resultRow("Average Requests/sec", rps),
+                resultRow("Total Workers", workers));
+
+        Separator firstDivider = resultDivider();
+        Separator secondDivider = resultDivider();
+        HBox resultData = new HBox(16, targetGroup, firstDivider, requestGroup, secondDivider, performanceGroup);
+        resultData.setAlignment(Pos.TOP_LEFT);
+        resultData.getStyleClass().add("dos-result-data");
+        HBox.setHgrow(targetGroup, Priority.ALWAYS);
+        HBox.setHgrow(requestGroup, Priority.ALWAYS);
+        HBox.setHgrow(performanceGroup, Priority.ALWAYS);
+
+        Label noticeTitle = new Label("No DoS simulation data yet",
                 CyberIcon.of(CyberIcon.Type.WARNING, 22, "dos-result-icon"));
-        notice.getStyleClass().add("dos-result-notice");
-        GridPane result = new GridPane(); result.setHgap(20); result.setVgap(7);
-        addCell(result, 0, 0, "Attack Type", type); addCell(result, 0, 1, "Target", resultTarget); addCell(result, 0, 2, "Duration", duration);
-        addCell(result, 1, 0, "Requests Sent", sent); addCell(result, 1, 1, "Successful", success); addCell(result, 1, 2, "Failed", failed);
-        addCell(result, 2, 0, "Limited / Rejected", limited); addCell(result, 2, 1, "Average Response", average); addCell(result, 2, 2, "Average Requests/sec", rps);
-        for (int index = 0; index < 3; index++) { ColumnConstraints c = new ColumnConstraints(); c.setPercentWidth(33.333); c.setHgrow(Priority.ALWAYS); result.getColumnConstraints().add(c); }
+        noticeTitle.getStyleClass().add("dos-result-notice-title");
+        Label noticeDetail = new Label("Start the simulation to see results here.");
+        noticeDetail.getStyleClass().add("dos-result-notice-detail");
+        VBox noticeCard = new VBox(12, noticeTitle, noticeDetail);
+        noticeCard.getStyleClass().add("dos-result-notice-card");
+
         Timeline update = new Timeline(new KeyFrame(Duration.millis(500), event -> {
             TrafficStatistics.Snapshot data = snapshot.get();
             if (data == null || !"DoS".equals(simulationType.get())) return;
@@ -160,11 +216,39 @@ final class DosSimulationTab {
             duration.setText((data.elapsedSeconds() + data.remainingSeconds()) + " seconds");
             sent.setText(Long.toString(data.sent())); success.setText(Long.toString(data.successful())); failed.setText(Long.toString(data.failed()));
             limited.setText(Long.toString(data.limited())); average.setText(String.format("%.1f ms", data.averageResponseMs())); rps.setText(String.format("%.1f", data.currentRate()));
-            notice.setText(simulationState.get() == SimulationState.RUNNING ? "DoS simulation is running" : "DoS simulation result available");
+            workers.setText(Integer.toString(data.activeWorkers()));
+            boolean running = simulationState.get() == SimulationState.RUNNING;
+            noticeTitle.setText(running ? "DoS simulation is running" : "DoS simulation result available");
+            noticeDetail.setText(running ? "Live metrics are being collected." : "The latest simulation metrics are shown on the left.");
         }));
         update.setCycleCount(Animation.INDEFINITE); update.play();
-        HBox body = new HBox(18, result, notice); HBox.setHgrow(result, Priority.ALWAYS);
+        HBox body = new HBox(12, resultData, noticeCard);
+        body.setAlignment(Pos.TOP_LEFT);
+        HBox.setHgrow(resultData, Priority.ALWAYS);
         return panel("SIMULATION RESULT", body);
+    }
+
+    private VBox resultGroup(Node... rows) {
+        VBox group = new VBox(8, rows);
+        group.getStyleClass().add("dos-result-group");
+        group.setMaxWidth(Double.MAX_VALUE);
+        return group;
+    }
+
+    private HBox resultRow(String name, Label value) {
+        Label key = new Label(name);
+        key.getStyleClass().add("dos-result-key");
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+        HBox row = new HBox(10, key, spacer, value);
+        row.setAlignment(Pos.CENTER_LEFT);
+        return row;
+    }
+
+    private Separator resultDivider() {
+        Separator divider = new Separator(Orientation.VERTICAL);
+        divider.getStyleClass().add("dos-result-divider");
+        return divider;
     }
 
     private VBox panel(String title, Node... children) {
@@ -185,5 +269,4 @@ final class DosSimulationTab {
         label.getStyleClass().add("dos-section-title");
         return label;
     }
-    private void addCell(GridPane grid, int column, int row, String name, Label value) { grid.add(new VBox(2, new Label(name), value), column, row); }
 }

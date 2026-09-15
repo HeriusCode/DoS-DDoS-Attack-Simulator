@@ -112,12 +112,9 @@ public final class MainDashboard extends BorderPane {
                 });
         DdosSimulationTab ddosTab = new DdosSimulationTab(target, ddos, ddosStatistics, ddosRateChart, ddosLog,
                 nodeTable, connectionLabel, controller::snapshot, typeLabel::getText, controller::state,
-                () -> !verifiedTarget.isBlank(), new DdosSimulationTab.Actions() {
+                new DdosSimulationTab.Actions() {
                     @Override public void testConnection() { MainDashboard.this.testConnection(); }
                     @Override public void exportLog() { MainDashboard.this.exportLog(); }
-                    @Override public void start() { MainDashboard.this.startSimulation(true); }
-                    @Override public void stop() { MainDashboard.this.stopSimulation(); }
-                    @Override public void reset() { MainDashboard.this.resetVisuals(); }
                 });
         LogsTab logsTab = new LogsTab(logEntries, filteredLogs, new LogsTab.Actions() {
             @Override public void clearAll() { MainDashboard.this.clearAllLogs(); }
@@ -321,6 +318,7 @@ public final class MainDashboard extends BorderPane {
             }
             elapsedLabel.setText(formatTime(snapshot.elapsedSeconds()));
             remainingLabel.setText(formatTime(snapshot.remainingSeconds()));
+            ddos.elapsed.setText(formatTime(snapshot.elapsedSeconds()));
             long total = snapshot.elapsedSeconds() + snapshot.remainingSeconds();
             double fraction = total == 0 ? 0 : Math.min(1, snapshot.elapsedSeconds() / (double) total);
             progress.setProgress(fraction);
@@ -348,6 +346,7 @@ public final class MainDashboard extends BorderPane {
         ddosRateSeries.getData().clear(); ddosSuccessSeries.getData().clear(); nodeTable.getItems().clear();
         progress.setProgress(0); progressText.setText("0%");
         elapsedLabel.setText("00:00"); remainingLabel.setText("--:--");
+        ddos.elapsed.setText("00:00");
         summaryType.setText("-"); summaryRate.setText("-"); summaryNodes.setText("-"); summaryDuration.setText("-");
         stateLabel.setText("IDLE"); typeLabel.setText("-"); dos.state.setText("STOPPED"); ddos.state.setText("STOPPED"); statistics.show(null);
         appendLog("INFO", "Dashboard display reset");
@@ -415,7 +414,7 @@ public final class MainDashboard extends BorderPane {
         LineChart<Number, Number> chart = new LineChart<>(x, y);
         chart.setAnimated(false);
         chart.setCreateSymbols(false);
-        chart.setLegendVisible(true);
+        chart.setLegendVisible(false);
         chart.setMinHeight(190);
         chart.setPrefHeight(220);
         dosRateSeries.setName("Current RPS");
@@ -430,7 +429,7 @@ public final class MainDashboard extends BorderPane {
         NumberAxis x = new NumberAxis(); NumberAxis y = new NumberAxis();
         x.setLabel("Time"); y.setLabel("Requests/sec");
         LineChart<Number, Number> chart = new LineChart<>(x,y);
-        chart.setAnimated(false); chart.setCreateSymbols(false); chart.setLegendVisible(true);
+        chart.setAnimated(false); chart.setCreateSymbols(false); chart.setLegendVisible(false);
         chart.setMinHeight(185); chart.setPrefHeight(215);
         ddosRateSeries.setName("Total RPS"); ddosSuccessSeries.setName("Successful RPS");
         chart.getData().add(ddosRateSeries);

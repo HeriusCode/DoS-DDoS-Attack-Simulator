@@ -7,13 +7,13 @@ import javafx.scene.layout.Priority;
 
 public final class DdosStatisticsPanel extends GridPane {
     private final MetricCard nodes = new MetricCard(CyberIcon.Type.NETWORK, "Active Nodes", "metric-cyan");
-    private final MetricCard sent = new MetricCard(CyberIcon.Type.EXPORT, "Total Requests Sent", "metric-blue");
-    private final MetricCard success = new MetricCard(CyberIcon.Type.SHIELD, "Successful", "metric-green");
-    private final MetricCard failed = new MetricCard(CyberIcon.Type.LIGHTNING, "Failed / Limited", "metric-red");
+    private final MetricCard sent = new MetricCard(CyberIcon.Type.SEND, "Total Requests Sent", "metric-blue");
+    private final MetricCard success = new MetricCard(CyberIcon.Type.CHECK_CIRCLE, "Successful", "metric-green");
+    private final MetricCard failed = new MetricCard(CyberIcon.Type.WARNING, "Failed / Limited", "metric-red");
     private final MetricCard rate = new MetricCard(CyberIcon.Type.CHART, "Current RPS", "metric-purple");
-    private final MetricCard response = new MetricCard(CyberIcon.Type.TARGET, "Average Response", "metric-yellow");
-    private final MetricCard elapsed = new MetricCard(CyberIcon.Type.RESET, "Elapsed Time", "metric-cyan");
-    private final MetricCard remaining = new MetricCard(CyberIcon.Type.LOG, "Remaining Time", "metric-blue");
+    private final MetricCard response = new MetricCard(CyberIcon.Type.CLOCK, "Average Response", "metric-yellow");
+    private final MetricCard elapsed = new MetricCard(CyberIcon.Type.CLOCK, "Elapsed Time", "metric-cyan");
+    private final MetricCard remaining = new MetricCard(CyberIcon.Type.RESET, "Remaining Time", "metric-blue");
 
     public DdosStatisticsPanel() {
         setHgap(9); setVgap(9);

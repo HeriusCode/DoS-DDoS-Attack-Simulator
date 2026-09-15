@@ -5,6 +5,7 @@ import client.model.TrafficStatistics;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.css.PseudoClass;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -15,19 +16,25 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 
 import java.util.function.Supplier;
+import java.util.Objects;
 
 /** DDoS simulation tab layout. */
 final class DdosSimulationTab {
-    interface Actions { void testConnection(); void exportLog(); void start(); void stop(); void reset(); }
+    private static final PseudoClass CONNECTED = PseudoClass.getPseudoClass("connected");
+
+    interface Actions { void testConnection(); void exportLog(); }
 
     private final TargetPanel target;
     private final DDoSSimulationPanel controls;
@@ -39,16 +46,15 @@ final class DdosSimulationTab {
     private final Supplier<TrafficStatistics.Snapshot> snapshot;
     private final Supplier<String> simulationType;
     private final Supplier<SimulationState> simulationState;
-    private final Supplier<Boolean> verified;
     private final Actions actions;
 
     DdosSimulationTab(TargetPanel target, DDoSSimulationPanel controls, DdosStatisticsPanel statistics,
                       LineChart<Number, Number> chart, TextArea log, TableView<TrafficStatistics.WorkerSnapshot> nodeTable,
                       Label connection, Supplier<TrafficStatistics.Snapshot> snapshot, Supplier<String> simulationType,
-                      Supplier<SimulationState> simulationState, Supplier<Boolean> verified, Actions actions) {
+                      Supplier<SimulationState> simulationState, Actions actions) {
         this.target = target; this.controls = controls; this.statistics = statistics; this.chart = chart; this.log = log;
         this.nodeTable = nodeTable; this.connection = connection; this.snapshot = snapshot; this.simulationType = simulationType;
-        this.simulationState = simulationState; this.verified = verified; this.actions = actions;
+        this.simulationState = simulationState; this.actions = actions;
     }
 
     Node build() {
@@ -56,13 +62,22 @@ final class DdosSimulationTab {
         HBox title = new HBox(14, CyberIcon.of(CyberIcon.Type.NETWORK, 42, "ddos-title-icon"),
                 ViewSupport.pageHeader("DDoS SIMULATION", "Simulate multiple logical traffic workers against the verified lab server"));
         title.setAlignment(Pos.CENTER_LEFT); title.getStyleClass().add("ddos-page-header");
-        VBox targetBox = panel("TARGET CONFIGURATION", targetForm());
+        VBox targetBox = panel("TARGET SERVER", targetForm());
         VBox controlsBox = panel("SIMULATION CONTROL", controls);
-        HBox top = new HBox(12, targetBox, controlsBox);
-        HBox.setHgrow(targetBox, Priority.ALWAYS); HBox.setHgrow(controlsBox, Priority.ALWAYS);
-        targetBox.setPrefWidth(620); controlsBox.setPrefWidth(520);
+        VBox leftColumn = new VBox(10, title, targetBox);
+        leftColumn.getStyleClass().add("ddos-top-left-column");
+        title.setMaxWidth(Double.MAX_VALUE);
+        targetBox.setMaxWidth(Double.MAX_VALUE);
 
-        VBox realtime = panel("REAL-TIME STATISTICS", statistics, chart);
+        HBox top = new HBox(12, leftColumn, controlsBox);
+        top.setFillHeight(true);
+        HBox.setHgrow(leftColumn, Priority.ALWAYS);
+        HBox.setHgrow(controlsBox, Priority.ALWAYS);
+        leftColumn.setPrefWidth(620);
+        controlsBox.setPrefWidth(520);
+        controlsBox.setMaxHeight(Double.MAX_VALUE);
+
+        VBox realtime = panel("REAL-TIME STATISTICS", statistics, chartBlock());
         VBox logPanel = logPanel();
         HBox middle = new HBox(12, realtime, logPanel);
         HBox.setHgrow(realtime, Priority.ALWAYS); HBox.setHgrow(logPanel, Priority.ALWAYS);
@@ -70,27 +85,57 @@ final class DdosSimulationTab {
 
         VBox nodes = panel("NODE STATUS", nodeTable);
         VBox result = resultPanel();
-        VBox quickActions = quickActions();
-        HBox bottom = new HBox(12, nodes, result, quickActions);
-        HBox.setHgrow(nodes, Priority.ALWAYS); HBox.setHgrow(result, Priority.ALWAYS); HBox.setHgrow(quickActions, Priority.ALWAYS);
-        nodes.setPrefWidth(480); result.setPrefWidth(350); quickActions.setPrefWidth(300);
-        root.getChildren().addAll(title, top, middle, bottom);
+        VBox map = mapPanel();
+        HBox bottom = new HBox(12, nodes, result, map);
+        HBox.setHgrow(nodes, Priority.ALWAYS);
+        HBox.setHgrow(result, Priority.ALWAYS);
+        HBox.setHgrow(map, Priority.ALWAYS);
+        nodes.setPrefWidth(480);
+        result.setPrefWidth(350);
+        map.setPrefWidth(300);
+        root.getChildren().addAll(top, middle, bottom);
         return ViewSupport.page(root);
     }
 
     private Node targetForm() {
-        TextField host = new TextField(), port = new TextField();
-        host.textProperty().bindBidirectional(target.host.textProperty()); port.textProperty().bindBidirectional(target.port.textProperty());
-        ComboBox<String> protocol = new ComboBox<>(); protocol.getItems().add("HTTP"); protocol.setValue("HTTP");
-        host.setMaxWidth(Double.MAX_VALUE); port.setMaxWidth(Double.MAX_VALUE); protocol.setMaxWidth(Double.MAX_VALUE);
-        Button test = ViewSupport.successButton("TEST CONNECTION"); test.setOnAction(event -> actions.testConnection());
-        Label connected = new Label(); connected.getStyleClass().add("ddos-connection");
-        Timeline update = new Timeline(new KeyFrame(Duration.millis(500), event -> connected.setText(connection.getText())));
-        update.setCycleCount(Animation.INDEFINITE); update.play();
-        GridPane grid = new GridPane(); grid.setHgap(12); grid.setVgap(7);
-        for (int index = 0; index < 4; index++) { ColumnConstraints column = new ColumnConstraints(); column.setPercentWidth(25); column.setHgrow(Priority.ALWAYS); grid.getColumnConstraints().add(column); }
+        TextField host = new TextField();
+        TextField port = new TextField();
+        host.textProperty().bindBidirectional(target.host.textProperty());
+        port.textProperty().bindBidirectional(target.port.textProperty());
+        ComboBox<String> protocol = new ComboBox<>();
+        protocol.getItems().add("HTTP");
+        protocol.setValue("HTTP");
+        host.setMaxWidth(Double.MAX_VALUE);
+        port.setMaxWidth(Double.MAX_VALUE);
+        protocol.setMaxWidth(Double.MAX_VALUE);
+
+        Button test = new Button("TEST CONNECTION", CyberIcon.of(CyberIcon.Type.LINK, 15, "button-icon"));
+        test.getStyleClass().addAll("cyber-button", "ddos-test-connection");
+        test.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+        test.setOnAction(event -> actions.testConnection());
+        Timeline update = new Timeline(new KeyFrame(Duration.millis(250), event -> {
+            String current = connection.getText().toLowerCase();
+            boolean connected = current.contains("connected") && !current.contains("failed");
+            test.setText(connected ? "CONNECTED" : "TEST CONNECTION");
+            test.setGraphic(CyberIcon.of(connected ? CyberIcon.Type.CHECK_CIRCLE : CyberIcon.Type.LINK,
+                    15, "button-icon"));
+            test.pseudoClassStateChanged(CONNECTED, connected);
+        }));
+        update.setCycleCount(Animation.INDEFINITE);
+        update.play();
+
+        GridPane grid = new GridPane();
+        grid.setHgap(12);
+        grid.setVgap(8);
+        for (double width : new double[]{30, 20, 20, 30}) {
+            ColumnConstraints column = new ColumnConstraints();
+            column.setPercentWidth(width);
+            column.setHgrow(Priority.ALWAYS);
+            grid.getColumnConstraints().add(column);
+        }
         grid.add(new Label("Target IP"), 0, 0); grid.add(new Label("Port"), 1, 0); grid.add(new Label("Protocol"), 2, 0);
-        grid.add(host, 0, 1); grid.add(port, 1, 1); grid.add(protocol, 2, 1); grid.add(test, 3, 1); grid.add(connected, 3, 2);
+        grid.add(host, 0, 1); grid.add(port, 1, 1); grid.add(protocol, 2, 1);
+        grid.add(test, 3, 0, 1, 2);
         return grid;
     }
 
@@ -102,6 +147,63 @@ final class DdosSimulationTab {
         log.setPrefHeight(340);
         VBox panel = new VBox(9, tools, log); panel.getStyleClass().addAll("cyber-panel", "ddos-panel"); panel.setPadding(new Insets(10));
         VBox.setVgrow(log, Priority.ALWAYS); return panel;
+    }
+
+    private VBox chartBlock() {
+        chart.setLegendVisible(false);
+        Label chartTitle = new Label("Request Rate");
+        chartTitle.getStyleClass().add("ddos-chart-title");
+        Label unit = new Label("(requests/sec)");
+        unit.getStyleClass().add("ddos-chart-unit");
+        HBox title = new HBox(9, chartTitle, unit);
+        title.setAlignment(Pos.CENTER_LEFT);
+
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+        HBox legend = new HBox(18,
+                legendItem("Total RPS", "ddos-legend-total"),
+                legendItem("Successful RPS", "ddos-legend-success"));
+        legend.setAlignment(Pos.CENTER_RIGHT);
+        HBox header = new HBox(10, title, spacer, legend);
+        header.setAlignment(Pos.CENTER_LEFT);
+
+        VBox block = new VBox(6, header, chart);
+        block.getStyleClass().add("ddos-chart-block");
+        VBox.setVgrow(chart, Priority.ALWAYS);
+        return block;
+    }
+
+    private HBox legendItem(String text, String colorClass) {
+        Region line = new Region();
+        line.getStyleClass().addAll("ddos-legend-line", colorClass);
+        Label label = new Label(text);
+        label.getStyleClass().add("ddos-legend-label");
+        HBox item = new HBox(7, line, label);
+        item.setAlignment(Pos.CENTER_LEFT);
+        return item;
+    }
+
+    private VBox mapPanel() {
+        ImageView map = new ImageView(new Image(Objects.requireNonNull(
+                getClass().getResourceAsStream("/client/assets/ddos-network-map.png"))));
+        map.setPreserveRatio(true);
+        map.setSmooth(true);
+        map.getStyleClass().add("ddos-map-image");
+
+        AnimatedCodeBackdrop codeBackdrop = new AnimatedCodeBackdrop();
+        StackPane frame = new StackPane(codeBackdrop, map);
+        map.fitWidthProperty().bind(frame.widthProperty().subtract(16));
+        map.fitHeightProperty().bind(frame.heightProperty().subtract(12));
+        codeBackdrop.maxWidthProperty().bind(frame.widthProperty());
+        codeBackdrop.maxHeightProperty().bind(frame.heightProperty());
+        frame.setMinHeight(218);
+        frame.setPrefHeight(218);
+        frame.getStyleClass().add("ddos-map-frame");
+        VBox panel = new VBox(frame);
+        panel.getStyleClass().addAll("cyber-panel", "ddos-panel", "ddos-map-panel");
+        panel.setPadding(new Insets(7));
+        VBox.setVgrow(frame, Priority.ALWAYS);
+        return panel;
     }
 
     private VBox resultPanel() {
@@ -122,18 +224,20 @@ final class DdosSimulationTab {
         return panel("SIMULATION RESULT", grid, message);
     }
 
-    private VBox quickActions() {
-        Button start = ViewSupport.successButton("START"), stop = ViewSupport.dangerButton("STOP"), reset = ViewSupport.secondaryButton("RESET");
-        start.setMaxWidth(Double.MAX_VALUE); stop.setMaxWidth(Double.MAX_VALUE); reset.setMaxWidth(Double.MAX_VALUE);
-        start.setOnAction(event -> actions.start()); stop.setOnAction(event -> actions.stop()); reset.setOnAction(event -> actions.reset());
-        Timeline enabled = new Timeline(new KeyFrame(Duration.millis(500), event -> {
-            boolean running = simulationState.get() == SimulationState.RUNNING;
-            start.setDisable(running || !verified.get()); stop.setDisable(!running);
-        }));
-        enabled.setCycleCount(Animation.INDEFINITE); enabled.play();
-        return panel("QUICK ACTIONS", start, stop, reset);
-    }
-
     private VBox panel(String title, Node... children) { VBox panel = new VBox(10, sectionTitle(title)); panel.getChildren().addAll(children); panel.getStyleClass().addAll("cyber-panel", "ddos-panel"); panel.setPadding(new Insets(10)); return panel; }
-    private Label sectionTitle(String text) { Label label = new Label(text); label.getStyleClass().add("ddos-section-title"); return label; }
+    private Label sectionTitle(String text) {
+        CyberIcon.Type icon = switch (text) {
+            case "TARGET SERVER" -> CyberIcon.Type.SERVER;
+            case "SIMULATION CONTROL" -> CyberIcon.Type.PLAY;
+            case "REAL-TIME STATISTICS" -> CyberIcon.Type.CHART;
+            case "SIMULATION LOG" -> CyberIcon.Type.LOG;
+            case "NODE STATUS" -> CyberIcon.Type.NETWORK;
+            case "SIMULATION RESULT" -> CyberIcon.Type.CLIPBOARD;
+            default -> CyberIcon.Type.NETWORK;
+        };
+        Label label = new Label(text, CyberIcon.of(icon, 18, "ddos-section-icon"));
+        label.setMaxWidth(Double.MAX_VALUE);
+        label.getStyleClass().add("ddos-section-title");
+        return label;
+    }
 }
