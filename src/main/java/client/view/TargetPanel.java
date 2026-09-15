@@ -13,7 +13,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
-/** Detailed target configuration form. Network actions are wired by MainDashboard. */
 public final class TargetPanel extends VBox {
     public final TextField host = new TextField("127.0.0.1");
     public final TextField port = new TextField("8080");

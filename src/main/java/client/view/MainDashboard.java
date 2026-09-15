@@ -89,7 +89,42 @@ public final class MainDashboard extends BorderPane {
         progressText.setId("progressText");
         getStyleClass().add("app-shell");
         setTop(buildHeader());
-        tabs.configure(buildDashboard(), buildTargetView(), buildDosView(), buildDdosView(), buildLogsView(),
+        TargetServerTab targetTab = new TargetServerTab(target, connectionLabel, responseTimeLabel,
+                httpStatusLabel, lastCheckedLabel, connectionLog, new TargetServerTab.Actions() {
+            @Override public void testConnection() { MainDashboard.this.testConnection(); }
+            @Override public void selectPreset(String host, String port, String address) {
+                MainDashboard.this.selectTargetPreset(host, port, address);
+            }
+        });
+        DashboardTab dashboardTab = new DashboardTab(statistics, rateChart, dashboardLog, target,
+                connectionLabel, dashboardStart, dashboardStop, new DashboardTab.Actions() {
+            @Override public void testConnection() { MainDashboard.this.testConnection(); }
+            @Override public void reset() { MainDashboard.this.resetVisuals(); }
+            @Override public void exportLog() { MainDashboard.this.exportLog(); }
+            @Override public void clearDashboardLog() { MainDashboard.this.clearDashboardLogs(); }
+        });
+        DosSimulationTab dosTab = new DosSimulationTab(target, dos, dosStatistics, dosRateChart, dosLog,
+                connectionLabel, controller::snapshot, typeLabel::getText, controller::state,
+                new DosSimulationTab.Actions() {
+                    @Override public void testConnection() { MainDashboard.this.testConnection(); }
+                    @Override public void exportLog() { MainDashboard.this.exportLog(); }
+                });
+        DdosSimulationTab ddosTab = new DdosSimulationTab(target, ddos, ddosStatistics, ddosRateChart, ddosLog,
+                nodeTable, connectionLabel, controller::snapshot, typeLabel::getText, controller::state,
+                () -> !verifiedTarget.isBlank(), new DdosSimulationTab.Actions() {
+                    @Override public void testConnection() { MainDashboard.this.testConnection(); }
+                    @Override public void exportLog() { MainDashboard.this.exportLog(); }
+                    @Override public void start() { MainDashboard.this.startSimulation(true); }
+                    @Override public void stop() { MainDashboard.this.stopSimulation(); }
+                    @Override public void reset() { MainDashboard.this.resetVisuals(); }
+                });
+        LogsTab logsTab = new LogsTab(logEntries, filteredLogs, new LogsTab.Actions() {
+            @Override public void clearAll() { MainDashboard.this.clearAllLogs(); }
+            @Override public void exportLog() { MainDashboard.this.exportLog(); }
+            @Override public void applyFilter(String level, String keyword) { MainDashboard.this.applyLogFilter(level, keyword); }
+            @Override public long countLevel(String level) { return MainDashboard.this.countLevel(level); }
+        });
+        tabs.configure(dashboardTab.build(), targetTab.build(), dosTab.build(), ddosTab.build(), logsTab.build(),
                 ddosMode -> selectedDdos = ddosMode);
         VBox mainArea = new VBox(tabs);
         mainArea.setPadding(new Insets(4, 10, 10, 10));
@@ -114,534 +149,6 @@ public final class MainDashboard extends BorderPane {
         appendLog("INFO", "Ready. Verify a private lab target before starting.");
         appendConnectionLog("INFO", "Target module initialized");
         appendConnectionLog("INFO", "Ready for connection test");
-    }
-
-    private Node buildDashboard() {
-        VBox content = new VBox(12);
-
-        VBox statsAndChart = cyberPanel("REAL-TIME STATISTICS", statistics, sectionLabel("Request Rate  (requests/sec)"), rateChart);
-        VBox logPanel = buildDashboardLogPanel();
-        HBox middle = new HBox(12, statsAndChart, logPanel);
-        HBox.setHgrow(statsAndChart, Priority.ALWAYS);
-        HBox.setHgrow(logPanel, Priority.ALWAYS);
-        statsAndChart.setPrefWidth(690);
-        logPanel.setPrefWidth(500);
-
-        VBox targetCard = buildDashboardTargetCard();
-        VBox actions = buildQuickActions();
-        VBox dataStream = buildDataStreamCard();
-        HBox bottom = new HBox(12, targetCard, actions, dataStream);
-        HBox.setHgrow(targetCard, Priority.ALWAYS);
-        HBox.setHgrow(actions, Priority.ALWAYS);
-        HBox.setHgrow(dataStream, Priority.ALWAYS);
-        targetCard.setPrefWidth(390);
-        actions.setPrefWidth(310);
-        dataStream.setPrefWidth(360);
-
-        content.getChildren().addAll(middle, bottom);
-        ScrollPane scroll = new ScrollPane(content);
-        scroll.setFitToWidth(true);
-        scroll.getStyleClass().add("dashboard-scroll");
-        return scroll;
-    }
-
-    private VBox buildDashboardLogPanel() {
-        Button clear = smallButton("CLEAR");
-        Button export = smallButton("EXPORT");
-        clear.setOnAction(event -> {
-            dashboardLog.clear();
-            fullLog.clear();
-            appendLog("INFO", "Log cleared");
-        });
-        export.setOnAction(event -> exportLog());
-        Region spacer = new Region();
-        HBox.setHgrow(spacer, Priority.ALWAYS);
-        HBox toolbar = new HBox(8, sectionLabel("LOG"), spacer, clear, export);
-        toolbar.setAlignment(Pos.CENTER_LEFT);
-        VBox panel = new VBox(9, toolbar, dashboardLog);
-        panel.getStyleClass().add("cyber-panel");
-        panel.setPadding(new Insets(10));
-        VBox.setVgrow(dashboardLog, Priority.ALWAYS);
-        dashboardLog.setPrefHeight(360);
-        return panel;
-    }
-
-    private VBox buildDashboardTargetCard() {
-        TextField host = new TextField();
-        TextField port = new TextField();
-        host.textProperty().bindBidirectional(target.host.textProperty());
-        port.textProperty().bindBidirectional(target.port.textProperty());
-        host.getStyleClass().add("cyber-field");
-        port.getStyleClass().add("cyber-field");
-        ComboBox<String> protocol = new ComboBox<>();
-        protocol.getItems().add("HTTP");
-        protocol.setValue("HTTP");
-        protocol.setMaxWidth(Double.MAX_VALUE);
-
-        GridPane form = new GridPane();
-        form.setHgap(10); form.setVgap(9);
-        form.add(new Label("IP Address"), 0, 0); form.add(host, 1, 0);
-        form.add(new Label("Port"), 0, 1); form.add(port, 1, 1);
-        form.add(new Label("Protocol"), 0, 2); form.add(protocol, 1, 2);
-        ColumnConstraints labels = new ColumnConstraints(85);
-        ColumnConstraints fields = new ColumnConstraints();
-        fields.setHgrow(Priority.ALWAYS);
-        form.getColumnConstraints().addAll(labels, fields);
-
-        Button test = successButton("TEST CONNECTION");
-        test.setMaxWidth(Double.MAX_VALUE);
-        test.setOnAction(event -> testConnection());
-        Label dashboardConnection = new Label();
-        dashboardConnection.getStyleClass().add("status-connected");
-        Timeline statusRefresh = new Timeline(new KeyFrame(Duration.millis(500), event ->
-                dashboardConnection.setText(connectionLabel.getText())));
-        statusRefresh.setCycleCount(Animation.INDEFINITE);
-        statusRefresh.play();
-        return cyberPanel("TARGET SERVER CONFIGURATION", form, test, dashboardConnection);
-    }
-
-    private VBox buildQuickActions() {
-        dashboardStart.setMaxWidth(Double.MAX_VALUE);
-        dashboardStop.setMaxWidth(Double.MAX_VALUE);
-        Button reset = secondaryButton("RESET");
-        reset.setMaxWidth(Double.MAX_VALUE);
-        reset.setOnAction(event -> resetVisuals());
-        return cyberPanel("QUICK ACTIONS", dashboardStart, dashboardStop, reset);
-    }
-
-    private VBox buildDataStreamCard() {
-        DataStreamView stream = new DataStreamView();
-        stream.setMinHeight(218);
-        stream.setPrefHeight(218);
-        VBox box = new VBox(stream);
-        box.getStyleClass().add("data-stream-card");
-        VBox.setVgrow(stream, Priority.ALWAYS);
-        return box;
-    }
-
-    private Node buildTargetView() {
-        VBox root = new VBox(14, pageHeader("TARGET SERVER", "Configure the target server (IP, Port, Protocol) and test connection"));
-        VBox configuration = cyberPanel("SERVER CONFIGURATION", target);
-        VBox right = new VBox(12, buildServerInformationPanel(), buildQuickPresets(), buildConnectionLogPanel());
-        VBox.setVgrow(right.getChildren().get(2), Priority.ALWAYS);
-        HBox body = new HBox(14, configuration, right);
-        HBox.setHgrow(configuration, Priority.ALWAYS);
-        HBox.setHgrow(right, Priority.ALWAYS);
-        configuration.setPrefWidth(620);
-        right.setPrefWidth(520);
-        root.getChildren().add(body);
-        return page(root);
-    }
-
-    private Node buildDosView() {
-        VBox root = new VBox(14);
-        root.getStyleClass().add("dos-view");
-
-        HBox title = new HBox(14,
-                CyberIcon.of(CyberIcon.Type.TARGET, 42, "dos-title-icon"),
-                pageHeader("DoS SIMULATION", "Simulate controlled single-source traffic against the verified lab server"));
-        title.setAlignment(Pos.CENTER_LEFT);
-        title.getStyleClass().add("dos-page-header");
-
-        VBox targetBox = dosPanel("TARGET SERVER", buildDosTargetForm());
-        VBox controlsBox = dosPanel("SIMULATION CONTROLS", dos);
-        HBox top = new HBox(14, targetBox, controlsBox);
-        HBox.setHgrow(targetBox, Priority.ALWAYS);
-        HBox.setHgrow(controlsBox, Priority.ALWAYS);
-        targetBox.setPrefWidth(640);
-        controlsBox.setPrefWidth(500);
-
-        VBox realtime = dosPanel("REAL-TIME STATISTICS", dosStatistics, dosRateChart);
-        VBox runtimeLog = buildDosLogPanel();
-        HBox middle = new HBox(14, realtime, runtimeLog);
-        HBox.setHgrow(realtime, Priority.ALWAYS);
-        HBox.setHgrow(runtimeLog, Priority.ALWAYS);
-        realtime.setPrefWidth(680);
-        runtimeLog.setPrefWidth(470);
-
-        root.getChildren().addAll(title, top, middle, buildDosResultPanel());
-        return page(root);
-    }
-
-    private Node buildDosTargetForm() {
-        TextField host = new TextField();
-        TextField port = new TextField();
-        host.textProperty().bindBidirectional(target.host.textProperty());
-        port.textProperty().bindBidirectional(target.port.textProperty());
-        ComboBox<String> protocol = new ComboBox<>();
-        protocol.getItems().add("HTTP");
-        protocol.setValue("HTTP");
-        protocol.setMaxWidth(Double.MAX_VALUE);
-        host.setMaxWidth(Double.MAX_VALUE);
-        port.setMaxWidth(Double.MAX_VALUE);
-
-        Label connection = new Label();
-        connection.getStyleClass().add("dos-connection");
-        Timeline update = new Timeline(new KeyFrame(Duration.millis(500), event ->
-                connection.setText(connectionLabel.getText())));
-        update.setCycleCount(Animation.INDEFINITE);
-        update.play();
-
-        Button test = secondaryButton("TEST CONNECTION");
-        test.setOnAction(event -> testConnection());
-        GridPane grid = new GridPane();
-        grid.setHgap(12); grid.setVgap(8);
-        ColumnConstraints c1 = new ColumnConstraints(); c1.setPercentWidth(30);
-        ColumnConstraints c2 = new ColumnConstraints(); c2.setPercentWidth(20);
-        ColumnConstraints c3 = new ColumnConstraints(); c3.setPercentWidth(20);
-        ColumnConstraints c4 = new ColumnConstraints(); c4.setPercentWidth(30);
-        grid.getColumnConstraints().addAll(c1, c2, c3, c4);
-        grid.add(new Label("Target IP"), 0, 0); grid.add(new Label("Port"), 1, 0); grid.add(new Label("Protocol"), 2, 0);
-        grid.add(host, 0, 1); grid.add(port, 1, 1); grid.add(protocol, 2, 1);
-        VBox connectionBox = new VBox(3, connection, new Label("Server reachability"));
-        connectionBox.getStyleClass().add("dos-connection-box");
-        grid.add(connectionBox, 3, 0, 1, 2);
-        grid.add(test, 3, 2);
-        return grid;
-    }
-
-    private VBox buildDosLogPanel() {
-        Button clear = smallButton("CLEAR");
-        Button export = smallButton("EXPORT");
-        clear.setOnAction(event -> dosLog.clear());
-        export.setOnAction(event -> exportLog());
-        Region spacer = new Region();
-        HBox.setHgrow(spacer, Priority.ALWAYS);
-        HBox toolbar = new HBox(8, dosSectionTitle("LOG"), spacer, clear, export);
-        toolbar.setAlignment(Pos.CENTER_LEFT);
-        dosLog.setPrefHeight(340);
-        VBox panel = new VBox(9, toolbar, dosLog);
-        panel.getStyleClass().addAll("cyber-panel", "dos-panel");
-        panel.setPadding(new Insets(10));
-        VBox.setVgrow(dosLog, Priority.ALWAYS);
-        return panel;
-    }
-
-    private VBox buildDosResultPanel() {
-        Label type = value("DoS");
-        Label resultTarget = value("-");
-        Label resultDuration = value("-");
-        Label resultSent = value("0");
-        Label resultSuccess = value("0");
-        Label resultFailed = value("0");
-        Label resultLimited = value("0");
-        Label resultAverage = value("0 ms");
-        Label resultRps = value("0");
-        Label notice = new Label("No DoS simulation data yet");
-        notice.getStyleClass().add("dos-result-notice");
-
-        GridPane result = new GridPane();
-        result.setHgap(20); result.setVgap(7);
-        addResultCell(result, 0, 0, "Attack Type", type);
-        addResultCell(result, 0, 1, "Target", resultTarget);
-        addResultCell(result, 0, 2, "Duration", resultDuration);
-        addResultCell(result, 1, 0, "Requests Sent", resultSent);
-        addResultCell(result, 1, 1, "Successful", resultSuccess);
-        addResultCell(result, 1, 2, "Failed", resultFailed);
-        addResultCell(result, 2, 0, "Limited / Rejected", resultLimited);
-        addResultCell(result, 2, 1, "Average Response", resultAverage);
-        addResultCell(result, 2, 2, "Average Requests/sec", resultRps);
-        for (int i = 0; i < 3; i++) {
-            ColumnConstraints column = new ColumnConstraints();
-            column.setPercentWidth(33.333); column.setHgrow(Priority.ALWAYS);
-            result.getColumnConstraints().add(column);
-        }
-
-        Timeline update = new Timeline(new KeyFrame(Duration.millis(500), event -> {
-            var snapshot = controller.snapshot();
-            boolean isDos = "DoS".equals(typeLabel.getText());
-            if (snapshot == null || !isDos) return;
-            resultTarget.setText(target.host.getText() + ":" + target.port.getText());
-            resultDuration.setText((snapshot.elapsedSeconds() + snapshot.remainingSeconds()) + " seconds");
-            resultSent.setText(Long.toString(snapshot.sent()));
-            resultSuccess.setText(Long.toString(snapshot.successful()));
-            resultFailed.setText(Long.toString(snapshot.failed()));
-            resultLimited.setText(Long.toString(snapshot.limited()));
-            resultAverage.setText(String.format("%.1f ms", snapshot.averageResponseMs()));
-            resultRps.setText(String.format("%.1f", snapshot.currentRate()));
-            notice.setText(controller.state() == SimulationState.RUNNING ? "DoS simulation is running" : "DoS simulation result available");
-        }));
-        update.setCycleCount(Animation.INDEFINITE);
-        update.play();
-
-        HBox body = new HBox(18, result, notice);
-        HBox.setHgrow(result, Priority.ALWAYS);
-        return dosPanel("SIMULATION RESULT", body);
-    }
-
-    private VBox dosPanel(String title, Node... children) {
-        VBox panel = new VBox(11, dosSectionTitle(title));
-        panel.getChildren().addAll(children);
-        panel.getStyleClass().addAll("cyber-panel", "dos-panel");
-        panel.setPadding(new Insets(11));
-        return panel;
-    }
-
-    private Label dosSectionTitle(String text) {
-        Label label = new Label(text);
-        label.getStyleClass().add("dos-section-title");
-        return label;
-    }
-
-    private void addResultCell(GridPane grid, int column, int row, String name, Label value) {
-        grid.add(new VBox(2, new Label(name), value), column, row);
-    }
-
-    private Node buildDdosView() {
-        VBox root = new VBox(12);
-        root.getStyleClass().add("ddos-view");
-        HBox title = new HBox(14,
-                CyberIcon.of(CyberIcon.Type.NETWORK, 42, "ddos-title-icon"),
-                pageHeader("DDoS SIMULATION", "Simulate multiple logical traffic workers against the verified lab server"));
-        title.setAlignment(Pos.CENTER_LEFT);
-        title.getStyleClass().add("ddos-page-header");
-
-        VBox targetBox = ddosPanel("TARGET CONFIGURATION", buildDdosTargetForm());
-        VBox controlsBox = ddosPanel("SIMULATION CONTROL", ddos);
-        HBox top = new HBox(12, targetBox, controlsBox);
-        HBox.setHgrow(targetBox, Priority.ALWAYS); HBox.setHgrow(controlsBox, Priority.ALWAYS);
-        targetBox.setPrefWidth(620); controlsBox.setPrefWidth(520);
-
-        VBox realtime = ddosPanel("REAL-TIME STATISTICS", ddosStatistics, ddosRateChart);
-        VBox logPanel = buildDdosLogPanel();
-        HBox middle = new HBox(12, realtime, logPanel);
-        HBox.setHgrow(realtime, Priority.ALWAYS); HBox.setHgrow(logPanel, Priority.ALWAYS);
-        realtime.setPrefWidth(680); logPanel.setPrefWidth(470);
-
-        VBox nodes = ddosPanel("NODE STATUS", nodeTable);
-        VBox result = buildDdosResultPanel();
-        VBox actions = buildDdosQuickActions();
-        HBox bottom = new HBox(12, nodes, result, actions);
-        HBox.setHgrow(nodes, Priority.ALWAYS); HBox.setHgrow(result, Priority.ALWAYS); HBox.setHgrow(actions, Priority.ALWAYS);
-        nodes.setPrefWidth(480); result.setPrefWidth(350); actions.setPrefWidth(300);
-
-        root.getChildren().addAll(title, top, middle, bottom);
-        return page(root);
-    }
-
-    private Node buildDdosTargetForm() {
-        TextField host = new TextField();
-        TextField port = new TextField();
-        host.textProperty().bindBidirectional(target.host.textProperty());
-        port.textProperty().bindBidirectional(target.port.textProperty());
-        ComboBox<String> protocol = new ComboBox<>();
-        protocol.getItems().add("HTTP"); protocol.setValue("HTTP");
-        host.setMaxWidth(Double.MAX_VALUE); port.setMaxWidth(Double.MAX_VALUE); protocol.setMaxWidth(Double.MAX_VALUE);
-        Button test = successButton("TEST CONNECTION");
-        test.setOnAction(event -> testConnection());
-        Label connected = new Label();
-        connected.getStyleClass().add("ddos-connection");
-        Timeline update = new Timeline(new KeyFrame(Duration.millis(500), event -> connected.setText(connectionLabel.getText())));
-        update.setCycleCount(Animation.INDEFINITE); update.play();
-
-        GridPane grid = new GridPane();
-        grid.setHgap(12); grid.setVgap(7);
-        for (int i = 0; i < 4; i++) {
-            ColumnConstraints column = new ColumnConstraints();
-            column.setPercentWidth(25); column.setHgrow(Priority.ALWAYS); grid.getColumnConstraints().add(column);
-        }
-        grid.add(new Label("Target IP"),0,0); grid.add(new Label("Port"),1,0); grid.add(new Label("Protocol"),2,0);
-        grid.add(host,0,1); grid.add(port,1,1); grid.add(protocol,2,1); grid.add(test,3,1); grid.add(connected,3,2);
-        return grid;
-    }
-
-    private VBox buildDdosLogPanel() {
-        Button clear = smallButton("CLEAR"); Button export = smallButton("EXPORT");
-        clear.setOnAction(event -> ddosLog.clear()); export.setOnAction(event -> exportLog());
-        Region spacer = new Region(); HBox.setHgrow(spacer, Priority.ALWAYS);
-        HBox tools = new HBox(8, ddosSectionTitle("SIMULATION LOG"), spacer, clear, export);
-        tools.setAlignment(Pos.CENTER_LEFT);
-        ddosLog.setPrefHeight(340);
-        VBox panel = new VBox(9, tools, ddosLog);
-        panel.getStyleClass().addAll("cyber-panel", "ddos-panel"); panel.setPadding(new Insets(10));
-        VBox.setVgrow(ddosLog, Priority.ALWAYS);
-        return panel;
-    }
-
-    private VBox buildDdosResultPanel() {
-        Label attack = value("DDoS"), resultTarget = value("-"), resultNodes = value("-"),
-                resultRate = value("-"), resultDuration = value("-");
-        Label message = new Label("No DDoS simulation data yet");
-        message.getStyleClass().add("ddos-result-message");
-        GridPane grid = new GridPane(); grid.setHgap(14); grid.setVgap(7);
-        addInfoRow(grid,0,"Attack Type",attack); addInfoRow(grid,1,"Target",resultTarget);
-        addInfoRow(grid,2,"Simulated Nodes",resultNodes); addInfoRow(grid,3,"Requests/sec/node",resultRate);
-        addInfoRow(grid,4,"Duration",resultDuration);
-        Timeline update = new Timeline(new KeyFrame(Duration.millis(500), event -> {
-            var snapshot = controller.snapshot();
-            if (snapshot == null || !"DDoS".equals(typeLabel.getText())) return;
-            resultTarget.setText(target.host.getText()+":"+target.port.getText());
-            resultNodes.setText(ddos.nodes.getText()); resultRate.setText(ddos.rate.getText());
-            resultDuration.setText((snapshot.elapsedSeconds()+snapshot.remainingSeconds())+" seconds");
-            message.setText(controller.state()==SimulationState.RUNNING ? "DDoS simulation is running" : "Simulation completed");
-        }));
-        update.setCycleCount(Animation.INDEFINITE); update.play();
-        return ddosPanel("SIMULATION RESULT", grid, message);
-    }
-
-    private VBox buildDdosQuickActions() {
-        Button start = successButton("START"); Button stop = dangerButton("STOP"); Button reset = secondaryButton("RESET");
-        start.setMaxWidth(Double.MAX_VALUE); stop.setMaxWidth(Double.MAX_VALUE); reset.setMaxWidth(Double.MAX_VALUE);
-        start.setOnAction(event -> startSimulation(true)); stop.setOnAction(event -> stopSimulation()); reset.setOnAction(event -> resetVisuals());
-        Timeline enabled = new Timeline(new KeyFrame(Duration.millis(500), event -> {
-            boolean running = controller.state()==SimulationState.RUNNING;
-            start.setDisable(running || verifiedTarget.isBlank()); stop.setDisable(!running);
-        }));
-        enabled.setCycleCount(Animation.INDEFINITE); enabled.play();
-        return ddosPanel("QUICK ACTIONS", start, stop, reset);
-    }
-
-    private VBox ddosPanel(String title, Node... children) {
-        VBox panel = new VBox(10, ddosSectionTitle(title)); panel.getChildren().addAll(children);
-        panel.getStyleClass().addAll("cyber-panel", "ddos-panel"); panel.setPadding(new Insets(10)); return panel;
-    }
-
-    private Label ddosSectionTitle(String text) {
-        Label label = new Label(text); label.getStyleClass().add("ddos-section-title"); return label;
-    }
-
-    private VBox buildServerInformationPanel() {
-        Label ip = value("");
-        Label port = value("");
-        Label status = value("");
-        Timeline update = new Timeline(new KeyFrame(Duration.millis(500), event -> {
-            ip.setText(target.host.getText());
-            port.setText(target.port.getText());
-            status.setText(connectionLabel.getText());
-        }));
-        update.setCycleCount(Animation.INDEFINITE);
-        update.play();
-
-        GridPane details = new GridPane();
-        details.setHgap(18); details.setVgap(9);
-        addInfoRow(details, 0, "Target IP", ip);
-        addInfoRow(details, 1, "Port", port);
-        addInfoRow(details, 2, "Protocol", value("HTTP"));
-        addInfoRow(details, 3, "Status", status);
-        addInfoRow(details, 4, "Response Time", responseTimeLabel);
-        addInfoRow(details, 5, "HTTP Status", httpStatusLabel);
-        addInfoRow(details, 6, "Last Checked", lastCheckedLabel);
-
-        StackPane serverVisual = new StackPane(CyberIcon.of(CyberIcon.Type.SERVER, 92, "server-large-icon"));
-        serverVisual.getStyleClass().add("server-visual");
-        HBox body = new HBox(22, details, serverVisual);
-        HBox.setHgrow(details, Priority.ALWAYS);
-        body.setAlignment(Pos.CENTER_LEFT);
-        return cyberPanel("SERVER INFORMATION", body);
-    }
-
-    private VBox buildQuickPresets() {
-        Button local = presetButton("LOCAL TEST", "127.0.0.1:8080 (HTTP)", "127.0.0.1", "8080");
-        Button lab = presetButton("LAB SERVER", "192.168.1.20:8080 (HTTP)", "192.168.1.20", "8080");
-        Label note = new Label("Presets only fill the form. Press Test Connection to verify.");
-        note.getStyleClass().add("form-hint");
-        return cyberPanel("QUICK PRESETS", local, lab, note);
-    }
-
-    private Button presetButton(String title, String address, String host, String port) {
-        Label name = new Label(title);
-        name.getStyleClass().add("preset-name");
-        Label value = new Label(address);
-        value.getStyleClass().add("preset-address");
-        Region spacer = new Region();
-        HBox.setHgrow(spacer, Priority.ALWAYS);
-        HBox row = new HBox(12, CyberIcon.of(CyberIcon.Type.SERVER, 22, "preset-icon"), name, spacer, value, new Label(">"));
-        row.setAlignment(Pos.CENTER_LEFT);
-        Button button = new Button();
-        button.setGraphic(row);
-        button.setMaxWidth(Double.MAX_VALUE);
-        button.getStyleClass().add("preset-button");
-        button.setOnAction(event -> {
-            target.host.setText(host);
-            target.port.setText(port);
-            verifiedTarget = "";
-            connectionLabel.setText("Not tested");
-            target.status.setText("NOT TESTED");
-            appendConnectionLog("INFO", "Preset selected: " + address + ". Connection test required.");
-            updateControls();
-        });
-        return button;
-    }
-
-    private VBox buildConnectionLogPanel() {
-        Button clear = smallButton("CLEAR");
-        clear.setOnAction(event -> connectionLog.clear());
-        Region spacer = new Region();
-        HBox.setHgrow(spacer, Priority.ALWAYS);
-        HBox toolbar = new HBox(8, sectionLabel("RECENT CONNECTION LOGS"), spacer, clear);
-        toolbar.setAlignment(Pos.CENTER_LEFT);
-        connectionLog.setPrefHeight(190);
-        VBox box = new VBox(9, toolbar, connectionLog);
-        box.getStyleClass().add("cyber-panel");
-        box.setPadding(new Insets(10));
-        VBox.setVgrow(connectionLog, Priority.ALWAYS);
-        return box;
-    }
-
-    private Node buildLogsView() {
-        TableView<LogEntry> table = createLogTable();
-        table.setItems(filteredLogs);
-
-        ComboBox<String> filter = new ComboBox<>();
-        filter.getItems().addAll("ALL", "INFO", "TRAFFIC", "WARNING", "ERROR", "DETECTION", "DEFENSE");
-        filter.setValue("ALL");
-        ComboBox<String> timeRange = new ComboBox<>();
-        timeRange.getItems().addAll("Current session", "Last 1 hour");
-        timeRange.setValue("Current session");
-        TextField search = new TextField();
-        search.setPromptText("Enter keyword...");
-        search.textProperty().addListener((observable, oldValue, newValue) -> applyLogFilter(filter.getValue(), newValue));
-        filter.valueProperty().addListener((observable, oldValue, newValue) -> applyLogFilter(newValue, search.getText()));
-
-        Button clear = secondaryButton("CLEAR");
-        Button export = secondaryButton("EXPORT");
-        clear.setOnAction(event -> clearAllLogs());
-        export.setOnAction(event -> exportLog());
-
-        HBox levelButtons = new HBox(9,
-                categoryButton("ALL", "all", filter), categoryButton("INFO", "info", filter),
-                categoryButton("TRAFFIC", "traffic", filter), categoryButton("WARNING", "warning", filter),
-                categoryButton("ERROR", "error", filter), categoryButton("DETECTION", "detection", filter),
-                categoryButton("DEFENSE", "defense", filter));
-        Region spacer = new Region();
-        HBox.setHgrow(spacer, Priority.ALWAYS);
-        HBox tools = new HBox(8, levelButtons, spacer, clear, export);
-        tools.setAlignment(Pos.CENTER_LEFT);
-
-        VBox filterPanel = cyberPanel("LOG FILTER",
-                new Label("LOG TYPE"), filter,
-                new Label("TIME RANGE"), timeRange,
-                new Label("SEARCH"), search);
-        filter.setMaxWidth(Double.MAX_VALUE); timeRange.setMaxWidth(Double.MAX_VALUE); search.setMaxWidth(Double.MAX_VALUE);
-
-        Label total = value("0"), info = value("0"), traffic = value("0"), warning = value("0"), error = value("0"), detection = value("0"), defense = value("0");
-        GridPane quickGrid = new GridPane(); quickGrid.setHgap(18); quickGrid.setVgap(8);
-        addInfoRow(quickGrid,0,"Total Logs",total); addInfoRow(quickGrid,1,"Info",info);
-        addInfoRow(quickGrid,2,"Traffic",traffic); addInfoRow(quickGrid,3,"Warning",warning);
-        addInfoRow(quickGrid,4,"Error",error); addInfoRow(quickGrid,5,"Detection",detection); addInfoRow(quickGrid,6,"Defense",defense);
-        VBox quickStats = cyberPanel("QUICK STATS", quickGrid);
-
-        CheckBox autoScroll = new CheckBox("Auto scroll enabled");
-        autoScroll.setSelected(true);
-        VBox live = cyberPanel("LIVE LOGS", autoScroll);
-        logEntries.addListener((javafx.collections.ListChangeListener<LogEntry>) change -> {
-            if (autoScroll.isSelected() && !filteredLogs.isEmpty()) Platform.runLater(() -> table.scrollTo(filteredLogs.size()-1));
-        });
-        Timeline counts = new Timeline(new KeyFrame(Duration.millis(500), event -> {
-            total.setText(Integer.toString(logEntries.size())); info.setText(Long.toString(countLevel("INFO")));
-            traffic.setText(Long.toString(countLevel("TRAFFIC"))); warning.setText(Long.toString(countLevel("WARNING")));
-            error.setText(Long.toString(countLevel("ERROR"))); detection.setText(Long.toString(countLevel("DETECTION")));
-            defense.setText(Long.toString(countLevel("DEFENSE")));
-        }));
-        counts.setCycleCount(Animation.INDEFINITE); counts.play();
-
-        VBox tablePanel = cyberPanel("EVENT STREAM", table);
-        VBox.setVgrow(table, Priority.ALWAYS); table.setPrefHeight(510);
-        VBox right = new VBox(10, filterPanel, quickStats, live); right.setPrefWidth(280);
-        HBox body = new HBox(12, tablePanel, right);
-        HBox.setHgrow(tablePanel, Priority.ALWAYS);
-        VBox root = new VBox(12, pageHeader("SYSTEM LOGS", "View and monitor all system events, attacks and simulation logs"), tools, body);
-        return page(root);
     }
 
     private HBox buildHeader() {
@@ -718,6 +225,16 @@ public final class MainDashboard extends BorderPane {
         Thread thread = new Thread(task, "lab-connection-test");
         thread.setDaemon(true);
         thread.start();
+    }
+
+    private void selectTargetPreset(String host, String port, String address) {
+        target.host.setText(host);
+        target.port.setText(port);
+        verifiedTarget = "";
+        connectionLabel.setText("Not tested");
+        target.status.setText("NOT TESTED");
+        appendConnectionLog("INFO", "Preset selected: " + address + ". Connection test required.");
+        updateControls();
     }
 
     private void startSimulation(boolean ddosMode) {
@@ -944,42 +461,6 @@ public final class MainDashboard extends BorderPane {
         return column;
     }
 
-    private TableView<LogEntry> createLogTable() {
-        TableView<LogEntry> table = new TableView<>();
-        table.getStyleClass().add("system-log-table");
-        TableColumn<LogEntry,String> time = logColumn("TIME", LogEntry::time);
-        TableColumn<LogEntry,String> level = logColumn("LEVEL", LogEntry::level);
-        TableColumn<LogEntry,String> component = logColumn("COMPONENT", LogEntry::component);
-        TableColumn<LogEntry,String> message = logColumn("MESSAGE", LogEntry::message);
-        time.setPrefWidth(115); level.setPrefWidth(105); component.setPrefWidth(155); message.setPrefWidth(620);
-        level.setCellFactory(column -> new TableCell<>() {
-            @Override protected void updateItem(String item, boolean empty) {
-                super.updateItem(item, empty);
-                getStyleClass().removeAll("level-info","level-traffic","level-warning","level-error","level-detection","level-defense");
-                if (empty || item == null) { setText(null); return; }
-                setText("[" + item + "]");
-                getStyleClass().add("level-" + item.toLowerCase());
-            }
-        });
-        table.getColumns().add(time); table.getColumns().add(level); table.getColumns().add(component); table.getColumns().add(message);
-        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
-        table.setPlaceholder(new Label("No log entries match the selected filter"));
-        return table;
-    }
-
-    private TableColumn<LogEntry,String> logColumn(String title, java.util.function.Function<LogEntry,String> mapper) {
-        TableColumn<LogEntry,String> column = new TableColumn<>(title);
-        column.setCellValueFactory(cell -> new ReadOnlyStringWrapper(mapper.apply(cell.getValue())));
-        return column;
-    }
-
-    private Button categoryButton(String title, String style, ComboBox<String> filter) {
-        Button button = new Button(title);
-        button.getStyleClass().addAll("log-category", "log-category-" + style);
-        button.setOnAction(event -> filter.setValue(title));
-        return button;
-    }
-
     private void applyLogFilter(String level, String keyword) {
         String wantedLevel = level == null ? "ALL" : level;
         String wantedText = keyword == null ? "" : keyword.trim().toLowerCase();
@@ -995,6 +476,12 @@ public final class MainDashboard extends BorderPane {
         logEntries.clear(); fullLog.clear(); dashboardLog.clear(); dosLog.clear(); ddosLog.clear(); connectionLog.clear();
     }
 
+    private void clearDashboardLogs() {
+        dashboardLog.clear();
+        fullLog.clear();
+        appendLog("INFO", "Log cleared");
+    }
+
     private String componentFor(String message) {
         String text = message.toLowerCase();
         if (text.contains("connection") || text.contains("target")) return "TargetServer";
@@ -1004,44 +491,10 @@ public final class MainDashboard extends BorderPane {
         return "Application";
     }
 
-    private VBox cyberPanel(String title, Node... content) {
-        Label heading = sectionLabel(title);
-        VBox panel = new VBox(10, heading);
-        panel.getChildren().addAll(content);
-        panel.getStyleClass().add("cyber-panel");
-        panel.setPadding(new Insets(11));
-        return panel;
-    }
-
-    private Label sectionLabel(String text) {
-        Label label = new Label(text, CyberIcon.of(sectionIconFor(text), 16, "section-icon"));
-        label.getStyleClass().add("section-title");
-        return label;
-    }
-
-    private CyberIcon.Type sectionIconFor(String title) {
-        String value = title.toUpperCase();
-        if (value.contains("LOG")) return CyberIcon.Type.LOG;
-        if (value.contains("TARGET") || value.contains("SERVER")) return CyberIcon.Type.TARGET;
-        if (value.contains("STAT") || value.contains("RATE")) return CyberIcon.Type.CHART;
-        if (value.contains("QUICK")) return CyberIcon.Type.LIGHTNING;
-        if (value.contains("SIMULATION")) return CyberIcon.Type.NETWORK;
-        return CyberIcon.Type.DASHBOARD;
-    }
     private Label value(String text) { Label label = new Label(text); label.getStyleClass().add("value-text"); return label; }
-    private Separator divider() { Separator separator = new Separator(javafx.geometry.Orientation.VERTICAL); separator.setPrefHeight(60); return separator; }
-    private VBox pair(String title, Label value) { return new VBox(2, new Label(title), value); }
-    private VBox statusColumn(String title, Node value) { VBox box = new VBox(5, new Label(title), value); box.getStyleClass().add("status-column"); return box; }
-    private VBox buildServerInformation() { return new VBox(9, pair("Target IP", value(target.host.getText())), pair("Port", value(target.port.getText())), pair("Protocol", value("HTTP")), pair("Status", connectionLabel)); }
-    private VBox pageHeader(String title, String subtitle) { Label h = new Label(title); h.getStyleClass().add("page-title"); Label s = new Label(subtitle); s.getStyleClass().add("page-subtitle"); return new VBox(3, h, s); }
-    private ScrollPane page(Node node) { ScrollPane scroll = new ScrollPane(node); scroll.setFitToWidth(true); scroll.getStyleClass().add("dashboard-scroll"); return scroll; }
     private TextArea terminal() { TextArea area = new TextArea(); area.setEditable(false); area.setWrapText(false); area.getStyleClass().add("terminal-log"); return area; }
     private Button successButton(String text) { Button button = new Button(text); button.setGraphic(CyberIcon.of(text.contains("TEST") ? CyberIcon.Type.TARGET : CyberIcon.Type.PLAY, 15, "button-icon")); button.getStyleClass().addAll("cyber-button", "cyber-button-success"); return button; }
     private Button dangerButton(String text) { Button button = new Button(text); button.setGraphic(CyberIcon.of(CyberIcon.Type.STOP, 14, "button-icon")); button.getStyleClass().addAll("cyber-button", "cyber-button-danger"); return button; }
-    private Button secondaryButton(String text) { Button button = new Button(text); CyberIcon.Type icon=text.contains("RESET")?CyberIcon.Type.RESET:text.contains("EXPORT")?CyberIcon.Type.EXPORT:text.contains("CLEAR")?CyberIcon.Type.TRASH:CyberIcon.Type.TARGET; button.setGraphic(CyberIcon.of(icon, 14, "button-icon")); button.getStyleClass().addAll("cyber-button", "cyber-button-secondary"); return button; }
-    private Button smallButton(String text) { Button button = secondaryButton(text); button.getStyleClass().add("small-button"); return button; }
-    private void addSummaryRow(GridPane grid, int row, String name, Label value) { grid.add(new Label(name), 0, row); grid.add(value, 1, row); }
-    private void addInfoRow(GridPane grid, int row, String name, Label value) { Label key = new Label(name); key.getStyleClass().add("info-key"); grid.add(key, 0, row); grid.add(value, 1, row); }
 
     private void styleExistingButtons() {
         target.test.getStyleClass().addAll("cyber-button", "cyber-button-secondary");
@@ -1055,6 +508,4 @@ public final class MainDashboard extends BorderPane {
         ddos.stop.getStyleClass().addAll("cyber-button", "cyber-button-danger");
         ddos.stop.setGraphic(CyberIcon.of(CyberIcon.Type.STOP, 14, "button-icon"));
     }
-
-    private record LogEntry(String time, String level, String component, String message) { }
 }
