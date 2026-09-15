@@ -145,42 +145,6 @@ public final class MainDashboard extends BorderPane {
         return scroll;
     }
 
-    private HBox buildTargetStatusRow() {
-        Label targetValue = new Label();
-        targetValue.getStyleClass().add("target-server-value");
-        Label targetConnection = new Label();
-        targetConnection.getStyleClass().add("status-connected");
-        Button test = secondaryButton("TEST CONNECTION");
-        test.setOnAction(event -> testConnection());
-
-        Timeline targetRefresh = new Timeline(new KeyFrame(Duration.millis(500), event -> {
-            targetValue.setText(target.host.getText() + "     : " + target.port.getText() + "   (HTTP)");
-            targetConnection.setText(connectionLabel.getText());
-        }));
-        targetRefresh.setCycleCount(Animation.INDEFINITE);
-        targetRefresh.play();
-
-        Region spacer = new Region();
-        HBox.setHgrow(spacer, Priority.ALWAYS);
-        HBox targetLine = new HBox(12, targetValue, spacer, targetConnection, test);
-        targetLine.setAlignment(Pos.CENTER_LEFT);
-        VBox targetBox = cyberPanel("TARGET SERVER", targetLine);
-
-        VBox state = statusColumn("STATUS", stateLabel);
-        VBox type = statusColumn("SIMULATION TYPE", typeLabel);
-        VBox realtime = statusColumn("REALTIME", new VBox(2, clockLabel, dateLabel));
-        HBox runtimeBox = new HBox(28, state, divider(), type, divider(), realtime);
-        runtimeBox.setAlignment(Pos.CENTER_LEFT);
-        runtimeBox.getStyleClass().add("runtime-strip");
-
-        HBox row = new HBox(14, targetBox, runtimeBox);
-        HBox.setHgrow(targetBox, Priority.ALWAYS);
-        HBox.setHgrow(runtimeBox, Priority.ALWAYS);
-        targetBox.setPrefWidth(610);
-        runtimeBox.setPrefWidth(560);
-        return row;
-    }
-
     private VBox buildDashboardLogPanel() {
         Button clear = smallButton("CLEAR");
         Button export = smallButton("EXPORT");
@@ -259,28 +223,6 @@ public final class MainDashboard extends BorderPane {
         box.getStyleClass().add("hacker-card");
         VBox.setVgrow(frame, Priority.ALWAYS);
         return box;
-    }
-
-    private VBox buildSummaryCard() {
-        progress.setPrefSize(92, 92);
-        progress.getStyleClass().add("simulation-progress");
-        StackPane progressStack = new StackPane(progress, progressText);
-        VBox times = new VBox(8,
-                pair("Elapsed", elapsedLabel),
-                pair("Remaining", remainingLabel));
-        HBox progressArea = new HBox(18, progressStack, times);
-        progressArea.setAlignment(Pos.CENTER_LEFT);
-
-        GridPane details = new GridPane();
-        details.setHgap(14); details.setVgap(7);
-        addSummaryRow(details, 0, "Attack Type", summaryType);
-        addSummaryRow(details, 1, "Target", summaryTarget);
-        addSummaryRow(details, 2, "Requests/sec", summaryRate);
-        addSummaryRow(details, 3, "Simulated Nodes", summaryNodes);
-        addSummaryRow(details, 4, "Duration", summaryDuration);
-        HBox body = new HBox(20, progressArea, details);
-        HBox.setHgrow(details, Priority.ALWAYS);
-        return cyberPanel("SIMULATION SUMMARY", body);
     }
 
     private Node buildTargetView() {
@@ -644,49 +586,6 @@ public final class MainDashboard extends BorderPane {
         return box;
     }
 
-    private Node buildAttackView(boolean ddosMode) {
-        Node controls = ddosMode ? ddos : dos;
-        String title = ddosMode ? "DDoS SIMULATION" : "DoS SIMULATION";
-        String subtitle = ddosMode ? "Simulate multiple logical traffic workers" : "Simulate controlled single-source traffic";
-        Label targetReadout = new Label();
-        targetReadout.getStyleClass().add("target-readout");
-        Timeline update = new Timeline(new KeyFrame(Duration.millis(500), event -> targetReadout.setText(
-                "Target IP     " + target.host.getText() + "\n" +
-                "Port          " + target.port.getText() + "\n" +
-                "Protocol      HTTP\n" +
-                "Connection    " + connectionLabel.getText())));
-        update.setCycleCount(Animation.INDEFINITE);
-        update.play();
-
-        VBox root = new VBox(14, pageHeader(title, subtitle));
-        HBox top = new HBox(14, cyberPanel("TARGET", targetReadout), cyberPanel("SIMULATION CONTROL", controls));
-        top.getChildren().forEach(node -> HBox.setHgrow(node, Priority.ALWAYS));
-        root.getChildren().addAll(top,
-                cyberPanel("REAL-TIME MONITOR", new Label("Live counters and request-rate graph are displayed on Dashboard.")),
-                cyberPanel("LAB SAFETY", new Label(ddosMode
-                        ? "Nodes are logical workers on this client. No botnet or remote agents are created."
-                        : "Only valid HTTP requests are sent to the verified private lab target.")));
-        return page(root);
-    }
-
-    private Node buildStatisticsView() {
-        Label overview = new Label();
-        overview.getStyleClass().add("statistics-overview");
-        Timeline update = new Timeline(new KeyFrame(Duration.millis(500), event -> {
-            var s = controller.snapshot();
-            overview.setText(s == null
-                    ? "Total Requests        0\nSuccessful            0\nFailed / Limited      0\nAverage RPS           0\nAverage Response      0 ms\nActive Workers        0"
-                    : "Total Requests        " + s.sent() + "\nSuccessful            " + s.successful() +
-                    "\nFailed / Limited      " + (s.failed() + s.limited()) +
-                    "\nAverage RPS           " + String.format("%.1f", s.currentRate()) +
-                    "\nAverage Response      " + String.format("%.1f ms", s.averageResponseMs()) +
-                    "\nActive Workers        " + s.activeWorkers());
-        }));
-        update.setCycleCount(Animation.INDEFINITE);
-        update.play();
-        return page(new VBox(14, pageHeader("TRAFFIC OVERVIEW", "Aggregate simulation metrics"), cyberPanel("STATISTICS", overview)));
-    }
-
     private Node buildLogsView() {
         TableView<LogEntry> table = createLogTable();
         table.setItems(filteredLogs);
@@ -753,18 +652,6 @@ public final class MainDashboard extends BorderPane {
         return page(root);
     }
 
-    private Node buildSettingsView() {
-        GridPane grid = new GridPane();
-        grid.setHgap(18); grid.setVgap(10);
-        grid.addRow(0, new Label("Theme"), value("Dark Cybersecurity"));
-        grid.addRow(1, new Label("Log level"), value("INFO"));
-        grid.addRow(2, new Label("Chart update interval"), value("500 ms"));
-        grid.addRow(3, new Label("Maximum requests/sec/node"), value(Integer.toString(SimulationConfig.MAX_RATE_PER_NODE)));
-        grid.addRow(4, new Label("Maximum duration"), value(SimulationConfig.MAX_DURATION_SECONDS + " seconds"));
-        grid.addRow(5, new Label("Maximum logical nodes"), value(Integer.toString(SimulationConfig.MAX_NODES)));
-        return page(new VBox(14, pageHeader("SETTINGS", "Application and enforced lab safety settings"), cyberPanel("APPLICATION & SIMULATION SAFETY", grid)));
-    }
-
     private HBox buildHeader() {
         ImageView logoImage = new ImageView(new Image(
                 MainDashboard.class.getResourceAsStream("/client/assets/header-logo.png")));
@@ -792,66 +679,6 @@ public final class MainDashboard extends BorderPane {
         header.setAlignment(Pos.CENTER_LEFT);
         header.getStyleClass().add("header");
         return header;
-    }
-
-    private VBox buildSidebar() {
-        VBox menu = new VBox(8);
-        menu.getStyleClass().add("sidebar");
-        menu.getChildren().add(sidebarTitle());
-        String[][] items = {
-                {"DB", "Dashboard", "Overview", "0"},
-                {"TS", "Target Server", "Configure target", "1"},
-                {"DS", "DoS Attack", "Single source attack", "2"},
-                {"DD", "DDoS Attack", "Multiple workers", "3"},
-                {"LG", "Logs", "Event logs", "5"},
-                {"CF", "Settings", "Advanced options", "6"}
-        };
-        for (int i = 0; i < items.length; i++) {
-            menu.getChildren().add(sidebarItem(items[i][0], items[i][1], items[i][2], Integer.parseInt(items[i][3]), i == 0));
-        }
-        Region spacer = new Region();
-        VBox.setVgrow(spacer, Priority.ALWAYS);
-        ImageView hacker = new ImageView(new Image(
-                MainDashboard.class.getResourceAsStream("/client/assets/hacker-sidebar.png")));
-        hacker.setPreserveRatio(true);
-        hacker.setFitWidth(188);
-        hacker.setFitHeight(194);
-        hacker.getStyleClass().add("sidebar-hacker");
-        Label footer = new Label("SECURE LAB CLIENT\nSTAY SAFE • LEARN & BUILD");
-        footer.getStyleClass().add("sidebar-footer");
-        menu.getChildren().addAll(spacer, hacker, footer);
-        return menu;
-    }
-
-    private Node sidebarTitle() {
-        Label mark = new Label("NETWORK\nSIMULATOR");
-        mark.getStyleClass().add("sidebar-brand");
-        return mark;
-    }
-
-    private Button sidebarItem(String code, String title, String subtitle, int tabIndex, boolean active) {
-        Label icon = new Label(code);
-        icon.getStyleClass().add("sidebar-icon");
-        VBox words = new VBox(2, new Label(title), new Label(subtitle));
-        words.getStyleClass().add("sidebar-copy");
-        HBox content = new HBox(12, icon, words);
-        content.setAlignment(Pos.CENTER_LEFT);
-        Button button = new Button();
-        button.setGraphic(content);
-        button.setMaxWidth(Double.MAX_VALUE);
-        button.getStyleClass().add("sidebar-item");
-        if (active) button.getStyleClass().add("sidebar-item-active");
-        button.setOnAction(event -> {
-            tabs.selectTab(tabIndex);
-            selectedDdos = tabIndex == 3 || (tabIndex != 2 && selectedDdos);
-            Node parent = button.getParent();
-            if (parent instanceof Pane pane) {
-                pane.getChildren().stream().filter(Button.class::isInstance)
-                        .forEach(node -> node.getStyleClass().remove("sidebar-item-active"));
-            }
-            button.getStyleClass().add("sidebar-item-active");
-        });
-        return button;
     }
 
     private void testConnection() {
