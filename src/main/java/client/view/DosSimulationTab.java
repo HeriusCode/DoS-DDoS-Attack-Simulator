@@ -68,11 +68,18 @@ final class DosSimulationTab {
 
         VBox targetBox = panel("TARGET SERVER", targetForm());
         VBox controlsBox = panel("SIMULATION CONTROLS", controls);
-        HBox top = new HBox(14, targetBox, controlsBox);
-        HBox.setHgrow(targetBox, Priority.ALWAYS);
+        VBox leftColumn = new VBox(10, title, targetBox);
+        leftColumn.getStyleClass().add("dos-top-left-column");
+        title.setMaxWidth(Double.MAX_VALUE);
+        targetBox.setMaxWidth(Double.MAX_VALUE);
+
+        HBox top = new HBox(14, leftColumn, controlsBox);
+        top.setFillHeight(true);
+        HBox.setHgrow(leftColumn, Priority.ALWAYS);
         HBox.setHgrow(controlsBox, Priority.ALWAYS);
-        targetBox.setPrefWidth(640);
+        leftColumn.setPrefWidth(640);
         controlsBox.setPrefWidth(500);
+        controlsBox.setMaxHeight(Double.MAX_VALUE);
 
         VBox realtime = panel("REAL-TIME STATISTICS", statistics, chart);
         VBox runtimeLog = logPanel();
@@ -82,7 +89,7 @@ final class DosSimulationTab {
         realtime.setPrefWidth(680);
         runtimeLog.setPrefWidth(470);
 
-        root.getChildren().addAll(title, top, middle, resultPanel());
+        root.getChildren().addAll(top, middle, resultPanel());
         return ViewSupport.page(root);
     }
 
