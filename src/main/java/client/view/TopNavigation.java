@@ -15,8 +15,8 @@ import java.util.List;
 import java.util.function.Consumer;
 
 public final class TopNavigation extends VBox {
-    /** Tabs stay separated; the diagonal is drawn inside each tab instead of overlapping siblings. */
-    private static final double TAB_GAP = 2;
+    /** A hairline gap keeps the cyber-tab outlines readable without breaking the baseline. */
+    private static final double TAB_GAP = 1;
     private static final PseudoClass ATTACK_ACTIVE = PseudoClass.getPseudoClass("attack-active");
 
     private final HBox tabStrip = new HBox(TAB_GAP);
@@ -67,7 +67,7 @@ public final class TopNavigation extends VBox {
 
     private void addTab(String title, CyberIcon.Type icon, String styleClass, boolean first) {
         int index = buttons.size();
-        ToggleButton button = new ToggleButton(title, CyberIcon.of(icon, 16, "tab-icon"));
+        ToggleButton button = new ToggleButton(title, CyberIcon.of(icon, 14, "tab-icon"));
         button.setToggleGroup(toggleGroup);
         button.setFocusTraversable(false);
         button.getStyleClass().addAll("top-nav-tab", styleClass);

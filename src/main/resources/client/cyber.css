@@ -56,9 +56,9 @@
 /* ---------- Top navigation & scrolling ---------- */
 .top-navigation { -fx-background-color: transparent; }
 .top-nav-header {
-    -fx-min-height: 35px;
-    -fx-pref-height: 35px;
-    -fx-max-height: 35px;
+    -fx-min-height: 31px;
+    -fx-pref-height: 31px;
+    -fx-max-height: 31px;
     -fx-alignment: center-left;
     -fx-background-color: #020b12;
     -fx-border-color: #087968;
@@ -67,15 +67,15 @@
 .top-navigation:attack-active .top-nav-header { -fx-border-color: #ff1744; }
 .top-nav-tabs { -fx-alignment: center-left; }
 .top-nav-tab {
-    -fx-min-width: 140px;
-    -fx-min-height: 34px;
-    -fx-pref-height: 34px;
-    -fx-max-height: 34px;
-    -fx-padding: 0 20px;
+    -fx-min-width: 82px;
+    -fx-min-height: 30px;
+    -fx-pref-height: 30px;
+    -fx-max-height: 30px;
+    -fx-padding: 0 10px 0 12px;
     -fx-alignment: center;
     -fx-content-display: left;
-    -fx-graphic-text-gap: 8px;
-    -fx-font-size: 11px;
+    -fx-graphic-text-gap: 7px;
+    -fx-font-size: 10px;
     -fx-font-weight: normal;
     -fx-text-fill: #6da8d3;
     -fx-background-color: linear-gradient(to bottom, #061522, #03101a);
@@ -83,16 +83,13 @@
     -fx-border-width: 1px;
     -fx-background-insets: 0;
     -fx-border-insets: 0;
+    /* Rounded only at the top; the bottom stays sharp against the baseline. */
+    -fx-shape: "M 4 0 H 124 Q 128 0 130 5 L 140 30 H 0 V 4 Q 0 0 4 0 Z";
+    -fx-scale-shape: true;
     -fx-background-radius: 0;
     -fx-border-radius: 0;
-    /* Vertical left edge; a single diagonal tip on the right, contained within this tab. */
-    -fx-shape: "M 0 0 L 124 0 L 140 34 L 0 34 Z";
-    -fx-scale-shape: true;
     -fx-cursor: hand;
     -fx-opacity: .62;
-}
-.top-nav-tab.first-tab {
-    -fx-shape: "M 0 0 L 124 0 L 140 34 L 0 34 Z";
 }
 .top-nav-tab:hover {
     -fx-opacity: .86;
