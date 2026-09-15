@@ -67,7 +67,10 @@
 .top-navigation:attack-active .top-nav-header { -fx-border-color: #ff1744; }
 .top-nav-tabs { -fx-alignment: center-left; }
 .top-nav-tab {
-    -fx-min-width: 82px;
+    /* Every card uses the Target Server width, so the strip stays balanced. */
+    -fx-min-width: 140px;
+    -fx-pref-width: 140px;
+    -fx-max-width: 140px;
     -fx-min-height: 30px;
     -fx-pref-height: 30px;
     -fx-max-height: 30px;
@@ -79,12 +82,13 @@
     -fx-font-weight: normal;
     -fx-text-fill: #6da8d3;
     -fx-background-color: linear-gradient(to bottom, #061522, #03101a);
-    -fx-border-color: #0d3c55;
+    /* Inactive cards deliberately have no outline. */
+    -fx-border-color: transparent;
     -fx-border-width: 1px;
     -fx-background-insets: 0;
     -fx-border-insets: 0;
     /* Rounded only at the top; the bottom stays sharp against the baseline. */
-    -fx-shape: "M 4 0 H 124 Q 128 0 130 5 L 140 30 H 0 V 4 Q 0 0 4 0 Z";
+    -fx-shape: "M 4 0 H 116 Q 121 0 123 5 L 140 30 H 0 V 4 Q 0 0 4 0 Z";
     -fx-scale-shape: true;
     -fx-background-radius: 0;
     -fx-border-radius: 0;

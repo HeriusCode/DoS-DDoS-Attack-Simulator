@@ -242,10 +242,7 @@ public final class MainDashboard extends BorderPane {
         Button reset = secondaryButton("RESET");
         reset.setMaxWidth(Double.MAX_VALUE);
         reset.setOnAction(event -> resetVisuals());
-        Label hint = new Label("Configure a target and choose the DoS or DDoS tab before starting.");
-        hint.setWrapText(true);
-        hint.getStyleClass().add("hint-box");
-        return cyberPanel("QUICK ACTIONS", dashboardStart, dashboardStop, reset, hint);
+        return cyberPanel("QUICK ACTIONS", dashboardStart, dashboardStop, reset);
     }
 
     private VBox buildHackerCard() {
