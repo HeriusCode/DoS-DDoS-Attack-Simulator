@@ -8,7 +8,8 @@ public final class CyberIcon {
     public enum Type {
         SHIELD, HOME, DASHBOARD, SERVER, MONITOR, PORT, LINK, WIFI, CHECK_CIRCLE,
         LOCK, CHIP, CHEVRON_RIGHT, LIGHTNING, NETWORK, CHART, LOG, SETTINGS,
-        TARGET, SEND, WARNING, CLOCK, CLIPBOARD, PLAY, STOP, RESET, EXPORT, TRASH
+        TARGET, SEND, WARNING, CLOCK, CLIPBOARD, PLAY, STOP, RESET, EXPORT, TRASH,
+        LIST, INFO, TRAFFIC, ERROR, FILTER, SEARCH, CALENDAR, PULSE
     }
 
     private CyberIcon() { }
@@ -57,6 +58,14 @@ public final class CyberIcon {
             case RESET -> "M12 4a8 8 0 1 1-7.4 5H2l3.5-4L9 9H6.7A6 6 0 1 0 12 6V4z";
             case EXPORT -> "M11 3h2v9l3-3 1.4 1.4L12 16l-5.4-5.6L8 9l3 3V3zM4 18h16v3H4v-3z";
             case TRASH -> "M7 7h2v12H7V7zm4 0h2v12h-2V7zm4 0h2v12h-2V7zM5 5h14v2H5V5zm3-3h8l1 2H7l1-2z";
+            case LIST -> "M4 5a2 2 0 1 1 0 4 2 2 0 0 1 0-4zm5 0h12v3H9V5zM4 11a2 2 0 1 1 0 4 2 2 0 0 1 0-4zm5 0h12v3H9v-3zM4 17a2 2 0 1 1 0 4 2 2 0 0 1 0-4zm5 0h12v3H9v-3z";
+            case INFO -> "M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3zm-2 5h3v7h2v2H9v-2h2v-5h-1v-2z";
+            case TRAFFIC -> "M3 7h13l-3-3 1.4-1.4L20 8l-5.6 5.4L13 12l3-3H3V7zm18 10H8l3 3-1.4 1.4L4 16l5.6-5.4L11 12l-3 3h13v2z";
+            case ERROR -> "M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm-4.2 5.8L12 10.6l4.2-4.2 1.4 1.4-4.2 4.2 4.2 4.2-1.4 1.4-4.2-4.2-4.2 4.2-1.4-1.4 4.2-4.2-4.2-4.2 1.4-1.4z";
+            case FILTER -> "M2 4h20l-8 9v6l-4 2v-8L2 4zm4.5 2 5.5 6.2L17.5 6h-11z";
+            case SEARCH -> "M10 3a7 7 0 1 0 4.9 12L21 21l-1.4 1.4-6.1-6.1A7 7 0 0 0 10 3zm0 2a5 5 0 1 1 0 10 5 5 0 0 1 0-10z";
+            case CALENDAR -> "M6 2h2v3h8V2h2v3h3v17H3V5h3V2zM5 9v11h14V9H5zm2 2h3v3H7v-3zm5 0h3v3h-3v-3zm5 0h1v3h-1v-3zM7 16h3v2H7v-2zm5 0h3v2h-3v-2z";
+            case PULSE -> "M1 13h5l2-6 4 12 3-9 2 3h6v2h-7l-1-1.5-3 9L8 12l-1 3H1v-2z";
         };
     }
 }

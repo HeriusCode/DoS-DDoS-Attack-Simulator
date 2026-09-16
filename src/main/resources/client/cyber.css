@@ -459,14 +459,15 @@
     -fx-border-color: #4d1320;
     -fx-border-radius: 5px;
     -fx-background-radius: 5px;
-    -fx-padding: 2px;
+    -fx-padding: 0;
 }
 .ddos-map-panel { -fx-alignment: center; }
 .ddos-map-image {
-    -fx-opacity: .92;
-    -fx-effect: dropshadow(gaussian, rgba(255,23,68,.50), 12, .24, 0, 0);
+    -fx-opacity: .88;
+    -fx-effect: dropshadow(gaussian, rgba(255,23,68,.58), 14, .28, 0, 0);
 }
 .ddos-code-backdrop { -fx-background-color: transparent; }
+.ddos-threat-overlay { -fx-background-color: transparent; }
 .ddos-view .metric-card { -fx-border-color: #23445e; -fx-min-height: 68px; }
 .ddos-view .metric-card:hover { -fx-border-color: #ff3157; }
 .ddos-chart .default-color0.chart-series-line { -fx-stroke: #ff1744; -fx-stroke-width: 2px; }
@@ -490,15 +491,23 @@
 }
 
 /* ---------- System Logs screen ---------- */
+.logs-view { -fx-background-color: transparent; }
+.logs-toolbar { -fx-min-height: 44px; }
 .log-category {
-    -fx-min-height: 38px; -fx-padding: 7 16;
+    -fx-min-height: 40px; -fx-padding: 7px 14px;
     -fx-background-color: #061521;
     -fx-border-color: #184c68;
     -fx-border-radius: 6px; -fx-background-radius: 6px;
     -fx-text-fill: #8dc0f5; -fx-font-size: 10px; -fx-font-weight: bold;
+    -fx-graphic-text-gap: 8px;
     -fx-cursor: hand;
 }
 .log-category:hover { -fx-background-color: rgba(0,229,255,.10); -fx-border-color: #00d6dc; }
+.log-category:selected {
+    -fx-background-color: rgba(0,255,179,.12);
+    -fx-border-color: #00d9aa;
+    -fx-effect: dropshadow(gaussian, rgba(0,255,179,.17), 8, .16, 0, 0);
+}
 .log-category-all { -fx-text-fill: #00ffb3; -fx-border-color: #00b88d; }
 .log-category-info { -fx-text-fill: #39dfd5; }
 .log-category-traffic { -fx-text-fill: #00e5ff; }
@@ -506,10 +515,27 @@
 .log-category-error { -fx-text-fill: #ff4766; }
 .log-category-detection { -fx-text-fill: #aa75ff; }
 .log-category-defense { -fx-text-fill: #51f09e; }
+.log-category .log-category-icon .icon-shape { -fx-fill: #79a9d6; }
+.log-category-all .log-category-icon .icon-shape { -fx-fill: #00ffb3; }
+.log-category-info .log-category-icon .icon-shape { -fx-fill: #39dfd5; }
+.log-category-traffic .log-category-icon .icon-shape { -fx-fill: #00e5ff; }
+.log-category-warning .log-category-icon .icon-shape { -fx-fill: #ffc13d; }
+.log-category-error .log-category-icon .icon-shape { -fx-fill: #ff4766; }
+.log-category-detection .log-category-icon .icon-shape { -fx-fill: #aa75ff; }
+.log-category-defense .log-category-icon .icon-shape { -fx-fill: #51f09e; }
+
+.logs-table-panel {
+    -fx-padding: 0;
+    -fx-background-color: #020a11;
+    -fx-border-color: #00a5a8;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
+}
 .system-log-table {
     -fx-background-color: #020a11;
-    -fx-border-color: #087c85;
-    -fx-border-radius: 4px;
+    -fx-border-color: transparent;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
     -fx-font-family: "Consolas";
 }
 .system-log-table .column-header-background { -fx-background-color: #061722; }
@@ -530,6 +556,82 @@
 .system-log-table .level-error { -fx-text-fill: #ff3e5d; -fx-font-weight: bold; }
 .system-log-table .level-detection { -fx-text-fill: #aa75ff; -fx-font-weight: bold; }
 .system-log-table .level-defense { -fx-text-fill: #49ef98; -fx-font-weight: bold; }
-.check-box { -fx-text-fill: #73cfd5; }
-.check-box .box { -fx-background-color: #071a24; -fx-border-color: #00a98a; -fx-border-radius: 8px; -fx-background-radius: 8px; }
-.check-box:selected .mark { -fx-background-color: #00ffb3; }
+
+.logs-side-panel {
+    -fx-background-color: rgba(3,16,24,.98);
+    -fx-border-color: #00a7a4;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
+}
+.logs-filter-panel { -fx-spacing: 9px; }
+.logs-filter-caption {
+    -fx-text-fill: #91c5ef;
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+}
+.logs-filter-field {
+    -fx-min-height: 40px;
+    -fx-pref-height: 40px;
+    -fx-padding: 0 9px;
+    -fx-background-color: #061522;
+    -fx-border-color: #087c9a;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+}
+.logs-filter-field:focused-within { -fx-border-color: #00d8c0; }
+.logs-filter-field-icon .icon-shape { -fx-fill: #6ebbe8; }
+.logs-filter-control,
+.logs-filter-control:focused {
+    -fx-min-height: 36px;
+    -fx-pref-height: 36px;
+    -fx-padding: 0;
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-background-radius: 0;
+    -fx-border-radius: 0;
+}
+.logs-filter-control .list-cell {
+    -fx-background-color: transparent;
+    -fx-text-fill: #a8cff8;
+}
+.logs-filter-control .arrow-button { -fx-background-color: transparent; }
+.logs-filter-control .arrow { -fx-background-color: #52acd5; }
+.logs-filter-control.text-field { -fx-prompt-text-fill: #608ab5; }
+
+.logs-stats-panel .section-title { -fx-padding: 0 0 7px 0; }
+.logs-stat-key { -fx-text-fill: #8fc5ef; -fx-font-size: 10px; }
+.logs-stats-panel .value-text { -fx-font-size: 11px; }
+.stat-total { -fx-text-fill: #a9cefa; }
+.stat-info { -fx-text-fill: #28e4cb; }
+.stat-traffic { -fx-text-fill: #30cfff; }
+.stat-warning { -fx-text-fill: #ffc13d; }
+.stat-error { -fx-text-fill: #ff4766; }
+.stat-detection { -fx-text-fill: #b37cff; }
+.stat-defense { -fx-text-fill: #51f09e; }
+
+.live-logs-panel { -fx-alignment: center-left; }
+.live-logs-icon .icon-shape {
+    -fx-fill: #00e7d0;
+    -fx-effect: dropshadow(gaussian, rgba(0,255,210,.42), 8, .25, 0, 0);
+}
+.live-logs-title {
+    -fx-text-fill: #00e9c0;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+.live-logs-subtitle { -fx-text-fill: #3bcbd1; -fx-font-size: 9px; }
+.live-log-switch {
+    -fx-padding: 3px;
+    -fx-background-color: #0a2a35;
+    -fx-border-color: #17667a;
+    -fx-border-radius: 14px;
+    -fx-background-radius: 14px;
+    -fx-cursor: hand;
+}
+.live-log-switch:selected {
+    -fx-background-color: #00b995;
+    -fx-border-color: #00f0c0;
+    -fx-effect: dropshadow(gaussian, rgba(0,255,190,.30), 8, .20, 0, 0);
+}
+.live-switch-knob { -fx-fill: #6f91a9; }
+.live-log-switch:selected .live-switch-knob { -fx-fill: #a8ffe8; }

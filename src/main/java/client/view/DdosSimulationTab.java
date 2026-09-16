@@ -3,6 +3,7 @@ package client.view;
 import client.model.SimulationState;
 import client.model.TrafficStatistics;
 import javafx.animation.Animation;
+import javafx.animation.FadeTransition;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.css.PseudoClass;
@@ -186,22 +187,35 @@ final class DdosSimulationTab {
     private VBox mapPanel() {
         ImageView map = new ImageView(new Image(Objects.requireNonNull(
                 getClass().getResourceAsStream("/client/assets/ddos-network-map.png"))));
-        map.setPreserveRatio(true);
+        map.setPreserveRatio(false);
         map.setSmooth(true);
+        map.setManaged(false);
+        map.setLayoutX(2);
+        map.setLayoutY(2);
         map.getStyleClass().add("ddos-map-image");
 
+        FadeTransition mapPulse = new FadeTransition(Duration.seconds(1.15), map);
+        mapPulse.setFromValue(.78);
+        mapPulse.setToValue(.96);
+        mapPulse.setAutoReverse(true);
+        mapPulse.setCycleCount(Animation.INDEFINITE);
+        mapPulse.play();
+
         AnimatedCodeBackdrop codeBackdrop = new AnimatedCodeBackdrop();
-        StackPane frame = new StackPane(codeBackdrop, map);
-        map.fitWidthProperty().bind(frame.widthProperty().subtract(16));
-        map.fitHeightProperty().bind(frame.heightProperty().subtract(12));
+        AnimatedThreatOverlay threatOverlay = new AnimatedThreatOverlay();
+        StackPane frame = new StackPane(codeBackdrop, map, threatOverlay);
+        map.fitWidthProperty().bind(frame.widthProperty().subtract(4));
+        map.fitHeightProperty().bind(frame.heightProperty().subtract(4));
         codeBackdrop.maxWidthProperty().bind(frame.widthProperty());
         codeBackdrop.maxHeightProperty().bind(frame.heightProperty());
+        threatOverlay.maxWidthProperty().bind(frame.widthProperty());
+        threatOverlay.maxHeightProperty().bind(frame.heightProperty());
         frame.setMinHeight(218);
         frame.setPrefHeight(218);
         frame.getStyleClass().add("ddos-map-frame");
         VBox panel = new VBox(frame);
         panel.getStyleClass().addAll("cyber-panel", "ddos-panel", "ddos-map-panel");
-        panel.setPadding(new Insets(7));
+        panel.setPadding(new Insets(3));
         VBox.setVgrow(frame, Priority.ALWAYS);
         return panel;
     }
