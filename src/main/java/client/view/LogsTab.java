@@ -191,13 +191,13 @@ live.setMaxHeight(60);
 body.setFillHeight(false);
 
 body.setMinHeight(0);
-body.setPrefHeight(540);
-body.setMaxHeight(540);
+body.setPrefHeight(530);
+body.setMaxHeight(530);
 
 HBox.setHgrow(tablePanel, Priority.ALWAYS);
 tablePanel.setMinHeight(0);
-tablePanel.setPrefHeight(540);
-tablePanel.setMaxHeight(540);
+tablePanel.setPrefHeight(530);
+tablePanel.setMaxHeight(530);
 
         VBox root = new VBox(12,
                 ViewSupport.pageHeader(CyberIcon.Type.LOG, "SYSTEM LOGS",
