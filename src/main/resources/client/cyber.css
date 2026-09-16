@@ -644,3 +644,105 @@
 }
 .live-switch-knob { -fx-fill: #6f91a9; }
 .live-log-switch:selected .live-switch-knob { -fx-fill: #a8ffe8; }
+
+/* ---------- Settings screen ---------- */
+.settings-view { -fx-background-color: transparent; }
+.settings-mode-label {
+    -fx-padding: 8px 14px;
+    -fx-text-fill: #00e9d0;
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+    -fx-border-color: transparent #0a5362 transparent #0a5362;
+    -fx-border-width: 0 1px 0 1px;
+}
+.settings-column { -fx-min-width: 385px; }
+.settings-side-column { -fx-min-width: 235px; -fx-max-width: 285px; }
+.settings-panel {
+    -fx-background-color: linear-gradient(to bottom right, rgba(3,18,28,.98), rgba(2,12,20,.98));
+    -fx-border-color: #009e9b;
+}
+.settings-panel-title {
+    -fx-padding: 0 0 8px 0;
+    -fx-border-color: transparent transparent #17485b transparent;
+    -fx-border-width: 0 0 1px 0;
+}
+.settings-row { -fx-min-height: 34px; }
+.settings-row-icon .icon-shape { -fx-fill: #5fc2e9; }
+.settings-row-label { -fx-text-fill: #a8c8ef; -fx-font-size: 10px; }
+.settings-row-suffix { -fx-min-width: 40px; -fx-text-fill: #91b9e8; -fx-font-size: 9px; }
+.settings-control {
+    -fx-min-height: 31px;
+    -fx-pref-height: 31px;
+    -fx-background-color: #061521;
+    -fx-border-color: #175577;
+    -fx-font-size: 10px;
+}
+.settings-toggle {
+    -fx-min-width: 43px; -fx-pref-width: 43px; -fx-max-width: 43px;
+    -fx-min-height: 22px; -fx-pref-height: 22px; -fx-max-height: 22px;
+    -fx-padding: 3px;
+    -fx-alignment: center-left;
+    -fx-background-color: #12394d;
+    -fx-border-color: #256681;
+    -fx-background-radius: 13px;
+    -fx-border-radius: 13px;
+    -fx-cursor: hand;
+}
+.settings-toggle:selected {
+    -fx-alignment: center-right;
+    -fx-background-color: #00b99a;
+    -fx-border-color: #00f0c2;
+    -fx-effect: dropshadow(gaussian, rgba(0,255,190,.28), 7, .2, 0, 0);
+}
+.settings-toggle-hint { -fx-text-fill: #62a8d7; -fx-font-size: 9px; }
+.settings-warning {
+    -fx-padding: 9px 11px;
+    -fx-text-fill: #ffc34a;
+    -fx-font-size: 9px;
+    -fx-graphic-text-gap: 10px;
+    -fx-background-color: rgba(255,174,0,.06);
+    -fx-border-color: #b77c00;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+}
+.settings-warning-icon .icon-shape { -fx-fill: #ffc34a; }
+.settings-browse { -fx-min-width: 35px; -fx-pref-width: 35px; -fx-padding: 4px; }
+.settings-clear-logs { -fx-min-height: 30px; -fx-font-size: 9px; }
+.settings-preset-caption { -fx-text-fill: #91b9e8; -fx-font-size: 10px; }
+.settings-preset-button {
+    -fx-min-height: 43px;
+    -fx-padding: 8px 10px;
+    -fx-background-color: rgba(0,229,255,.035);
+    -fx-border-color: #176682;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+    -fx-cursor: hand;
+}
+.settings-preset-button:hover {
+    -fx-background-color: rgba(0,255,179,.12);
+    -fx-border-color: #00d9b0;
+}
+.settings-preset-name { -fx-text-fill: #aed0f8; -fx-font-size: 10px; }
+.settings-preset-value { -fx-text-fill: #83b9ee; -fx-font-size: 9px; }
+.settings-about-key { -fx-text-fill: #49c9df; -fx-font-size: 10px; }
+.settings-about-value { -fx-text-fill: #91c5f2; -fx-font-size: 10px; }
+.settings-reminder-line { -fx-text-fill: #8fc8f2; -fx-font-size: 10px; }
+.settings-learning-card {
+    -fx-min-height: 175px;
+    -fx-padding: 14px;
+    -fx-background-color: linear-gradient(to bottom, rgba(2,20,31,.98), rgba(1,12,20,.98));
+    -fx-border-color: #008e94;
+    -fx-border-radius: 7px;
+    -fx-background-radius: 7px;
+}
+.settings-learning-icon .icon-shape {
+    -fx-fill: #00e9d0;
+    -fx-effect: dropshadow(gaussian, rgba(0,255,210,.35), 10, .25, 0, 0);
+}
+.settings-learning-copy {
+    -fx-text-fill: #00e9d0;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-line-spacing: 6px;
+    -fx-graphic-text-gap: 14px;
+}

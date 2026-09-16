@@ -47,10 +47,11 @@ public final class TopNavigation extends VBox {
             Node dosView,
             Node ddosView,
             Node logsView,
+            Node settingsView,
             Consumer<Boolean> attackModeChanged
     ) {
         this.attackModeChanged = attackModeChanged == null ? mode -> { } : attackModeChanged;
-        views = List.of(dashboardView, targetView, dosView, ddosView, logsView);
+        views = List.of(dashboardView, targetView, dosView, ddosView, logsView, settingsView);
 
         buttons.clear();
         tabStrip.getChildren().clear();
@@ -61,6 +62,7 @@ public final class TopNavigation extends VBox {
         addTab("DoS Attack", CyberIcon.Type.LIGHTNING, "dos-tab", false);
         addTab("DDoS Attack", CyberIcon.Type.NETWORK, "ddos-tab", false);
         addTab("Logs", CyberIcon.Type.LOG, "logs-tab", false);
+        addTab("Settings", CyberIcon.Type.SETTINGS, "settings-tab", false);
 
         selectTab(0);
     }

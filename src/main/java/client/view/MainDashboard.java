@@ -122,7 +122,14 @@ public final class MainDashboard extends BorderPane {
             @Override public void applyFilter(String level, String keyword) { MainDashboard.this.applyLogFilter(level, keyword); }
             @Override public long countLevel(String level) { return MainDashboard.this.countLevel(level); }
         });
+        SettingsTab settingsTab = new SettingsTab(new SettingsTab.Actions() {
+            @Override public void clearLogs() { MainDashboard.this.clearAllLogs(); }
+            @Override public void selectPreset(String host, String port, String address) {
+                MainDashboard.this.selectTargetPreset(host, port, address);
+            }
+        });
         tabs.configure(dashboardTab.build(), targetTab.build(), dosTab.build(), ddosTab.build(), logsTab.build(),
+                settingsTab.build(),
                 ddosMode -> selectedDdos = ddosMode);
         VBox mainArea = new VBox(tabs);
         mainArea.setPadding(new Insets(4, 10, 10, 10));

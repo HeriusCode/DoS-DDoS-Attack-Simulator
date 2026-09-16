@@ -9,7 +9,7 @@ public final class CyberIcon {
         SHIELD, HOME, DASHBOARD, SERVER, MONITOR, PORT, LINK, WIFI, CHECK_CIRCLE,
         LOCK, CHIP, CHEVRON_RIGHT, LIGHTNING, NETWORK, CHART, LOG, SETTINGS,
         TARGET, SEND, WARNING, CLOCK, CLIPBOARD, PLAY, STOP, RESET, EXPORT, TRASH,
-        LIST, INFO, TRAFFIC, ERROR, FILTER, SEARCH, CALENDAR, PULSE
+        LIST, INFO, TRAFFIC, ERROR, FILTER, SEARCH, CALENDAR, PULSE, FOLDER
     }
 
     private CyberIcon() { }
@@ -66,6 +66,7 @@ public final class CyberIcon {
             case SEARCH -> "M10 3a7 7 0 1 0 4.9 12L21 21l-1.4 1.4-6.1-6.1A7 7 0 0 0 10 3zm0 2a5 5 0 1 1 0 10 5 5 0 0 1 0-10z";
             case CALENDAR -> "M6 2h2v3h8V2h2v3h3v17H3V5h3V2zM5 9v11h14V9H5zm2 2h3v3H7v-3zm5 0h3v3h-3v-3zm5 0h1v3h-1v-3zM7 16h3v2H7v-2zm5 0h3v2h-3v-2z";
             case PULSE -> "M1 13h5l2-6 4 12 3-9 2 3h6v2h-7l-1-1.5-3 9L8 12l-1 3H1v-2z";
+            case FOLDER -> "M3 5h7l2 2h9a2 2 0 0 1 2 2l-2 11H3a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2zm0 4v9h16.3l1.6-9H3z";
         };
     }
 }
