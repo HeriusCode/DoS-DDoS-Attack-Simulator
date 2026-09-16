@@ -17,7 +17,7 @@
     -fx-border-color: #00bfa5;
     -fx-border-width: 0 0 1 0;
 }
-.header-logo { -fx-min-width: 42px; -fx-min-height: 42px; -fx-alignment: center; -fx-effect: dropshadow(gaussian, rgba(0,255,179,.48), 12, .28, 0, 0); }
+.header-logo { -fx-min-width: 48px; -fx-min-height: 44px; -fx-alignment: center; -fx-effect: dropshadow(gaussian, rgba(0,255,179,.48), 12, .28, 0, 0); }
 .brand { -fx-text-fill: #00ffb3; -fx-font-size: 21px; -fx-font-weight: bold; }
 .safe { -fx-text-fill: #82b8f5; -fx-font-size: 11px; }
 .system-ready { -fx-text-fill: #00ffb3; -fx-font-size: 11px; }
@@ -350,6 +350,15 @@
 .dos-legend-current { -fx-background-color: #ff1744; }
 .dos-legend-target { -fx-background-color: #274866; }
 .chart-legend-item { -fx-text-fill: #9dc3ef; }
+.dashboard-chart-header { -fx-padding: 2 1 0 1; }
+.dashboard-chart-title { -fx-text-fill: #00ffb3; -fx-font-size: 12px; -fx-font-weight: bold; }
+.dashboard-chart-unit { -fx-text-fill: #67a2d8; -fx-font-size: 9px; }
+.dashboard-legend-label { -fx-text-fill: #9dc3ef; -fx-font-size: 9px; }
+.dashboard-legend-line {
+    -fx-min-width: 19px; -fx-pref-width: 19px; -fx-max-width: 19px;
+    -fx-min-height: 3px; -fx-pref-height: 3px; -fx-max-height: 3px;
+}
+.dashboard-legend-current { -fx-background-color: #00ffb3; }
 .dos-result-data {
     -fx-padding: 12 14;
     -fx-background-color: #050f18;

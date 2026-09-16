@@ -53,7 +53,7 @@ final class DashboardTab {
     Node build() {
         VBox content = new VBox(12);
         VBox statsAndChart = ViewSupport.panel("REAL-TIME STATISTICS", statistics,
-                ViewSupport.sectionTitle("Request Rate  (requests/sec)"), rateChart);
+                requestRateHeader(), rateChart);
         VBox logPanel = logPanel();
         HBox middle = new HBox(12, statsAndChart, logPanel);
         HBox.setHgrow(statsAndChart, Priority.ALWAYS);
@@ -74,6 +74,28 @@ final class DashboardTab {
 
         content.getChildren().addAll(middle, bottom);
         return ViewSupport.page(content);
+    }
+
+    private HBox requestRateHeader() {
+        Label title = new Label("Request Rate");
+        title.getStyleClass().add("dashboard-chart-title");
+        Label unit = new Label("(requests/sec)");
+        unit.getStyleClass().add("dashboard-chart-unit");
+
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+
+        Region line = new Region();
+        line.getStyleClass().addAll("dashboard-legend-line", "dashboard-legend-current");
+        Label legendText = new Label("Current RPS");
+        legendText.getStyleClass().add("dashboard-legend-label");
+        HBox legend = new HBox(7, line, legendText);
+        legend.setAlignment(Pos.CENTER_LEFT);
+
+        HBox header = new HBox(10, title, unit, spacer, legend);
+        header.getStyleClass().add("dashboard-chart-header");
+        header.setAlignment(Pos.CENTER_LEFT);
+        return header;
     }
 
     private VBox logPanel() {

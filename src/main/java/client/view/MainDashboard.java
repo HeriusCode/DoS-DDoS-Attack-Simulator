@@ -151,11 +151,11 @@ public final class MainDashboard extends BorderPane {
 
     private HBox buildHeader() {
         ImageView logoImage = new ImageView(new Image(
-                MainDashboard.class.getResourceAsStream("/client/assets/header-logo.png")));
+                MainDashboard.class.getResourceAsStream("/client/assets/header-hacker-logo.png")));
         logoImage.setPreserveRatio(true);
         logoImage.setSmooth(true);
-        logoImage.setFitWidth(39);
-        logoImage.setFitHeight(39);
+        logoImage.setFitWidth(48);
+        logoImage.setFitHeight(44);
         StackPane logo = new StackPane(logoImage);
         logo.getStyleClass().add("header-logo");
         Label brand = new Label("DOS/DDoS ATTACK SIMULATOR");
