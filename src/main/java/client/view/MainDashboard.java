@@ -325,7 +325,6 @@ public final class MainDashboard extends BorderPane {
             }
             elapsedLabel.setText(formatTime(snapshot.elapsedSeconds()));
             remainingLabel.setText(formatTime(snapshot.remainingSeconds()));
-            ddos.elapsed.setText(formatTime(snapshot.elapsedSeconds()));
             long total = snapshot.elapsedSeconds() + snapshot.remainingSeconds();
             double fraction = total == 0 ? 0 : Math.min(1, snapshot.elapsedSeconds() / (double) total);
             progress.setProgress(fraction);
@@ -353,7 +352,6 @@ public final class MainDashboard extends BorderPane {
         ddosRateSeries.getData().clear(); ddosSuccessSeries.getData().clear(); nodeTable.getItems().clear();
         progress.setProgress(0); progressText.setText("0%");
         elapsedLabel.setText("00:00"); remainingLabel.setText("--:--");
-        ddos.elapsed.setText("00:00");
         summaryType.setText("-"); summaryRate.setText("-"); summaryNodes.setText("-"); summaryDuration.setText("-");
         stateLabel.setText("IDLE"); typeLabel.setText("-"); dos.state.setText("STOPPED"); ddos.state.setText("STOPPED"); statistics.show(null);
         appendLog("INFO", "Dashboard display reset");
@@ -402,7 +400,8 @@ public final class MainDashboard extends BorderPane {
 
     private LineChart<Number, Number> createChart() {
         NumberAxis x = new NumberAxis(0, 30, 5);
-        NumberAxis y = new NumberAxis(0, SimulationConfig.MAX_NODES * SimulationConfig.MAX_RATE_PER_NODE, 10);
+        NumberAxis y = new NumberAxis();
+        y.setForceZeroInRange(true);
         x.setLabel("Time"); y.setLabel("Requests/sec");
         LineChart<Number, Number> chart = new LineChart<>(x, y);
         chart.setAnimated(false); chart.setCreateSymbols(false); chart.setLegendVisible(false);
