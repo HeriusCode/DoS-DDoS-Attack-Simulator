@@ -9,7 +9,8 @@ public final class CyberIcon {
         SHIELD, HOME, DASHBOARD, SERVER, MONITOR, PORT, LINK, WIFI, CHECK_CIRCLE,
         LOCK, CHIP, CHEVRON_RIGHT, LIGHTNING, NETWORK, CHART, LOG, SETTINGS,
         TARGET, SEND, WARNING, CLOCK, CLIPBOARD, PLAY, STOP, RESET, EXPORT, TRASH,
-        LIST, INFO, TRAFFIC, ERROR, FILTER, SEARCH, CALENDAR, PULSE, FOLDER
+        LIST, INFO, TRAFFIC, ERROR, FILTER, SEARCH, CALENDAR, PULSE, FOLDER,
+        MINIMIZE, MAXIMIZE, RESTORE, CLOSE
     }
 
     private CyberIcon() { }
@@ -67,6 +68,10 @@ public final class CyberIcon {
             case CALENDAR -> "M6 2h2v3h8V2h2v3h3v17H3V5h3V2zM5 9v11h14V9H5zm2 2h3v3H7v-3zm5 0h3v3h-3v-3zm5 0h1v3h-1v-3zM7 16h3v2H7v-2zm5 0h3v2h-3v-2z";
             case PULSE -> "M1 13h5l2-6 4 12 3-9 2 3h6v2h-7l-1-1.5-3 9L8 12l-1 3H1v-2z";
             case FOLDER -> "M3 5h7l2 2h9a2 2 0 0 1 2 2l-2 11H3a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2zm0 4v9h16.3l1.6-9H3z";
+            case MINIMIZE -> "M3 11h18v2H3z";
+            case MAXIMIZE -> "M3 3h18v18H3V3zm2 2v14h14V5H5z";
+            case RESTORE -> "M7 3h14v14h-3V6H7V3zM3 7h14v14H3V7zm2 2v10h10V9H5z";
+            case CLOSE -> "M5.4 4 12 10.6 18.6 4 20 5.4 13.4 12l6.6 6.6-1.4 1.4-6.6-6.6-6.6 6.6L4 18.6l6.6-6.6L4 5.4 5.4 4z";
         };
     }
 }

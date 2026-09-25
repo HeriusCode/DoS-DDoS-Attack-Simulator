@@ -63,6 +63,11 @@ final class ViewSupport {
     static ScrollPane page(Node content) {
         ScrollPane scroll = new ScrollPane(content);
         scroll.setFitToWidth(true);
+        scroll.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+        if (content instanceof VBox box) {
+            scroll.viewportBoundsProperty().addListener((observable, oldBounds, bounds) ->
+                    box.setMinHeight(bounds.getHeight()));
+        }
         scroll.getStyleClass().add("dashboard-scroll");
         return scroll;
     }

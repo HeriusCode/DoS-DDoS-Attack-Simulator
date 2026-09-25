@@ -15,16 +15,19 @@ public final class MetricCard extends VBox {
         Node icon = CyberIcon.of(iconType, 27, colorClass);
         Label caption = new Label(title);
         caption.getStyleClass().add("metric-caption");
+        caption.setWrapText(true);
+        caption.setMinWidth(0);
         value.getStyleClass().addAll("metric-value", colorClass);
 
         VBox text = new VBox(3, caption, value);
+        text.setMinWidth(0);
         HBox row = new HBox(12, icon, text);
         row.setAlignment(Pos.CENTER_LEFT);
         HBox.setHgrow(text, Priority.ALWAYS);
 
         getChildren().add(row);
         getStyleClass().add("metric-card");
-        setMaxWidth(Double.MAX_VALUE);
+        setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
     }
 
     public void setValue(String text) {

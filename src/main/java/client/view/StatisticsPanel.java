@@ -5,6 +5,7 @@ import javafx.geometry.Insets;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.RowConstraints;
 
 /** Six responsive metric cards used by the dashboard. */
 public final class StatisticsPanel extends GridPane {
@@ -24,6 +25,12 @@ public final class StatisticsPanel extends GridPane {
             column.setPercentWidth(33.333);
             column.setHgrow(Priority.ALWAYS);
             getColumnConstraints().add(column);
+        }
+        for (int i = 0; i < 2; i++) {
+            RowConstraints row = new RowConstraints();
+            row.setPercentHeight(50);
+            row.setVgrow(Priority.ALWAYS);
+            getRowConstraints().add(row);
         }
         add(sent, 0, 0); add(success, 1, 0); add(failed, 2, 0);
         add(rate, 0, 1); add(response, 1, 1); add(workers, 2, 1);

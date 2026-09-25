@@ -82,6 +82,10 @@ final class DdosSimulationTab {
         VBox logPanel = logPanel();
         HBox middle = new HBox(12, realtime, logPanel);
         HBox.setHgrow(realtime, Priority.ALWAYS); HBox.setHgrow(logPanel, Priority.ALWAYS);
+        realtime.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+        logPanel.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+        middle.setMaxHeight(Double.MAX_VALUE);
+        VBox.setVgrow(middle, Priority.ALWAYS);
         realtime.setPrefWidth(680); logPanel.setPrefWidth(470);
 
         VBox nodes = panel("NODE STATUS", nodeTable);
@@ -170,6 +174,8 @@ final class DdosSimulationTab {
 
         VBox block = new VBox(6, header, chart);
         block.getStyleClass().add("ddos-chart-block");
+        block.setMaxHeight(Double.MAX_VALUE);
+        chart.setMaxHeight(Double.MAX_VALUE);
         VBox.setVgrow(chart, Priority.ALWAYS);
         return block;
     }

@@ -188,16 +188,15 @@ live.setMaxHeight(60);
         right.getStyleClass().add("logs-right-column");
 
         HBox body = new HBox(12, tablePanel, right);
-body.setFillHeight(false);
+        body.setFillHeight(true);
+        body.setMinHeight(0);
+        body.setPrefHeight(530);
+        body.setMaxHeight(Double.MAX_VALUE);
+        VBox.setVgrow(body, Priority.ALWAYS);
 
-body.setMinHeight(0);
-body.setPrefHeight(530);
-body.setMaxHeight(530);
-
-HBox.setHgrow(tablePanel, Priority.ALWAYS);
-tablePanel.setMinHeight(0);
-tablePanel.setPrefHeight(530);
-tablePanel.setMaxHeight(530);
+        HBox.setHgrow(tablePanel, Priority.ALWAYS);
+        tablePanel.setMinHeight(0);
+        tablePanel.setMaxHeight(Double.MAX_VALUE);
 
         VBox root = new VBox(12,
                 ViewSupport.pageHeader(CyberIcon.Type.LOG, "SYSTEM LOGS",

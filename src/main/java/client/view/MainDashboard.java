@@ -84,6 +84,8 @@ public final class MainDashboard extends BorderPane {
     private volatile String verifiedTarget = "";
     private boolean selectedDdos;
     private int chartSample;
+    private double dragOffsetX;
+    private double dragOffsetY;
 
     public MainDashboard() {
         progressText.setId("progressText");
@@ -134,6 +136,7 @@ public final class MainDashboard extends BorderPane {
         VBox mainArea = new VBox(tabs);
         mainArea.setPadding(new Insets(4, 10, 10, 10));
         VBox.setVgrow(tabs, Priority.ALWAYS);
+        tabs.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         setCenter(mainArea);
 
         styleExistingButtons();
@@ -179,10 +182,56 @@ public final class MainDashboard extends BorderPane {
                 headerClock.setText(LocalDate.now() + "  " + LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")))));
         time.setCycleCount(Animation.INDEFINITE);
         time.play();
-        HBox header = new HBox(16, logo, brand, environment, spacer, ready, headerClock);
+        Button minimize = windowButton(CyberIcon.Type.MINIMIZE, "Thu nhỏ");
+        Button maximize = windowButton(CyberIcon.Type.RESTORE, "Khôi phục");
+        Button close = windowButton(CyberIcon.Type.CLOSE, "Đóng");
+        close.getStyleClass().add("close-window-button");
+        minimize.setOnAction(event -> currentStage().setIconified(true));
+        maximize.setOnAction(event -> currentStage().setMaximized(!currentStage().isMaximized()));
+        close.setOnAction(event -> currentStage().close());
+        maximize.sceneProperty().addListener((sceneObservable, oldScene, scene) -> {
+            if (scene == null) return;
+            scene.windowProperty().addListener((windowObservable, oldWindow, window) -> {
+                if (window instanceof javafx.stage.Stage stage) {
+                    updateMaximizeButton(maximize, stage.isMaximized());
+                    stage.maximizedProperty().addListener((property, previous, maximized) ->
+                            updateMaximizeButton(maximize, maximized));
+                }
+            });
+        });
+        HBox windowControls = new HBox(minimize, maximize, close);
+        windowControls.getStyleClass().add("window-controls");
+        HBox header = new HBox(16, logo, brand, environment, spacer, ready, headerClock, windowControls);
         header.setAlignment(Pos.CENTER_LEFT);
         header.getStyleClass().add("header");
+        header.setOnMousePressed(event -> {
+            dragOffsetX = event.getScreenX() - currentStage().getX();
+            dragOffsetY = event.getScreenY() - currentStage().getY();
+        });
+        header.setOnMouseDragged(event -> {
+            if (event.getTarget() instanceof Button || currentStage().isMaximized()) return;
+            currentStage().setX(event.getScreenX() - dragOffsetX);
+            currentStage().setY(event.getScreenY() - dragOffsetY);
+        });
         return header;
+    }
+
+    private javafx.stage.Stage currentStage() {
+        return (javafx.stage.Stage) getScene().getWindow();
+    }
+
+    private Button windowButton(CyberIcon.Type icon, String description) {
+        Button button = new Button("", CyberIcon.of(icon, 20, "window-control-icon"));
+        button.setTooltip(new Tooltip(description));
+        button.setFocusTraversable(false);
+        button.getStyleClass().add("window-control");
+        return button;
+    }
+
+    private void updateMaximizeButton(Button button, boolean maximized) {
+        button.setGraphic(CyberIcon.of(maximized ? CyberIcon.Type.RESTORE
+                : CyberIcon.Type.MAXIMIZE, 20, "window-control-icon"));
+        button.getTooltip().setText(maximized ? "Khôi phục" : "Phóng to");
     }
 
     private void testConnection() {

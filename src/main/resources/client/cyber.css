@@ -10,8 +10,8 @@
 
 /* ---------- Header ---------- */
 .header {
-    -fx-min-height: 58px;
-    -fx-padding: 10 20;
+    -fx-min-height: 64px;
+    -fx-padding: 7 12 7 20;
     -fx-alignment: center-left;
     -fx-background-color: #031019;
     -fx-border-color: #00bfa5;
@@ -22,6 +22,29 @@
 .safe { -fx-text-fill: #82b8f5; -fx-font-size: 11px; }
 .system-ready { -fx-text-fill: #00ffb3; -fx-font-size: 11px; }
 .header-clock { -fx-text-fill: #9dc5f4; -fx-font-size: 11px; }
+.window-controls {
+    -fx-alignment: center-right;
+    -fx-border-color: transparent transparent transparent #164052;
+    -fx-border-width: 0 0 0 1px;
+}
+.window-control {
+    -fx-min-width: 50px; -fx-pref-width: 50px; -fx-max-width: 50px;
+    -fx-min-height: 50px; -fx-pref-height: 50px; -fx-max-height: 50px;
+    -fx-padding: 0;
+    -fx-background-color: transparent;
+    -fx-background-radius: 0;
+    -fx-cursor: hand;
+}
+.window-control-icon .icon-shape {
+    -fx-fill: #1be8e0;
+    -fx-effect: dropshadow(gaussian, rgba(0,255,232,.34), 5, .25, 0, 0);
+}
+.window-control:hover { -fx-background-color: #0a3548; }
+.window-control:hover .window-control-icon .icon-shape { -fx-fill: #bdffff; }
+.window-control:armed { -fx-background-color: #0a5268; }
+.close-window-button:hover { -fx-background-color: #c12042; }
+.close-window-button:armed { -fx-background-color: #e23053; }
+.close-window-button:hover .window-control-icon .icon-shape { -fx-fill: white; }
 
 /* ---------- Sidebar/navigation ---------- */
 .sidebar {
@@ -229,6 +252,7 @@
 .metric-blue .icon-shape { -fx-fill: #21a8ff; }.metric-green .icon-shape { -fx-fill: #00f0a8; }
 .metric-red .icon-shape { -fx-fill: #ff3e5d; }.metric-purple .icon-shape { -fx-fill: #a46bff; }
 .metric-yellow .icon-shape { -fx-fill: #ffc34d; }.metric-cyan .icon-shape { -fx-fill: #24d8e9; }
+.dos-view .metric-value { -fx-font-size: 17px; }
 
 /* ---------- Forms & buttons ---------- */
 .text-field, .combo-box, .text-area .content {

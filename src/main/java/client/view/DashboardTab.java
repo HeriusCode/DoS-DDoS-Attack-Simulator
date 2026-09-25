@@ -58,6 +58,14 @@ final class DashboardTab {
         HBox middle = new HBox(12, statsAndChart, logPanel);
         HBox.setHgrow(statsAndChart, Priority.ALWAYS);
         HBox.setHgrow(logPanel, Priority.ALWAYS);
+        statsAndChart.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+        logPanel.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+        middle.setMaxHeight(Double.MAX_VALUE);
+        VBox.setVgrow(middle, Priority.ALWAYS);
+        statistics.setMaxHeight(Double.MAX_VALUE);
+        VBox.setVgrow(statistics, Priority.ALWAYS);
+        rateChart.setMaxHeight(Double.MAX_VALUE);
+        VBox.setVgrow(rateChart, Priority.ALWAYS);
         statsAndChart.setPrefWidth(690);
         logPanel.setPrefWidth(500);
 
@@ -68,6 +76,9 @@ final class DashboardTab {
         HBox.setHgrow(targetCard, Priority.ALWAYS);
         HBox.setHgrow(quickActions, Priority.ALWAYS);
         HBox.setHgrow(dataStream, Priority.ALWAYS);
+        targetCard.setMaxWidth(Double.MAX_VALUE);
+        quickActions.setMaxWidth(Double.MAX_VALUE);
+        dataStream.setMaxWidth(Double.MAX_VALUE);
         targetCard.setPrefWidth(390);
         quickActions.setPrefWidth(310);
         dataStream.setPrefWidth(360);

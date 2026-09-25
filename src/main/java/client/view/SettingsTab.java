@@ -49,6 +49,8 @@ final class SettingsTab {
 
         HBox body = new HBox(14, left, center, right);
         body.setAlignment(Pos.TOP_LEFT);
+        body.setMaxHeight(Double.MAX_VALUE);
+        VBox.setVgrow(body, Priority.ALWAYS);
         VBox root = new VBox(12, header, body);
         root.getStyleClass().add("settings-view");
         return ViewSupport.page(root);

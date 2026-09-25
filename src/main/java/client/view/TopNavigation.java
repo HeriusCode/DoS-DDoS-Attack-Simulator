@@ -37,6 +37,7 @@ public final class TopNavigation extends VBox {
         StackPane.setAlignment(tabStrip, Pos.CENTER_LEFT);
 
         contentHost.getStyleClass().add("top-nav-content");
+        contentHost.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         getChildren().addAll(header, contentHost);
         VBox.setVgrow(contentHost, Priority.ALWAYS);
     }

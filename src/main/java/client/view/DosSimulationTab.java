@@ -88,6 +88,10 @@ final class DosSimulationTab {
         HBox middle = new HBox(14, realtime, runtimeLog);
         HBox.setHgrow(realtime, Priority.ALWAYS);
         HBox.setHgrow(runtimeLog, Priority.ALWAYS);
+        realtime.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+        runtimeLog.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+        middle.setMaxHeight(Double.MAX_VALUE);
+        VBox.setVgrow(middle, Priority.ALWAYS);
         realtime.setPrefWidth(680);
         runtimeLog.setPrefWidth(470);
 
@@ -163,6 +167,8 @@ final class DosSimulationTab {
 
         VBox block = new VBox(6, header, chart);
         block.getStyleClass().add("dos-chart-block");
+        block.setMaxHeight(Double.MAX_VALUE);
+        chart.setMaxHeight(Double.MAX_VALUE);
         VBox.setVgrow(chart, Priority.ALWAYS);
         return block;
     }
